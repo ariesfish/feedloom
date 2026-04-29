@@ -16,7 +16,7 @@ Feedloom is a command-line tool for archiving long-form web content. It takes ar
 
 ## Requirements
 
-- Node.js >= 22
+- Node.js >= 24
 - pnpm
 - macOS, Linux, or Windows should work; browser-based fetching depends on Patchright/Chromium.
 

@@ -6,11 +6,11 @@ This file provides guidance for AI coding agents working on this repository.
 
 Feedloom is a TypeScript CLI tool for archiving long-form web content as clean Markdown with local assets. It accepts article URLs, URL list files, or RSS/Atom feeds, fetches the pages, extracts readable content, converts it to Markdown, and writes notes with YAML frontmatter.
 
-The package is an ESM Node.js CLI targeting Node.js 22+.
+The package is an ESM Node.js CLI targeting Node.js 24+.
 
 ## Tech Stack
 
-- Runtime: Node.js >= 22
+- Runtime: Node.js >= 24
 - Language: TypeScript
 - Module system: ESM (`"type": "module"`)
 - Package manager: pnpm

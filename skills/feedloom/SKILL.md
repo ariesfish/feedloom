@@ -22,6 +22,8 @@ npx -y @ariesfish/feedloom <inputs...> [options]
 
 ## Common usage
 
+Before running Feedloom, check whether this skill directory has a `site-rules/` directory. If it exists, always pass it with `--site-rules-dir $HOME/.agents/skills/feedloom/site-rules`; do not omit available site rules.
+
 ```bash
 npx -y @ariesfish/feedloom "https://example.com/article"
 npx -y @ariesfish/feedloom urls.txt
@@ -56,20 +58,20 @@ Use the least expensive mode that works:
 - `--wait-ms <ms>`, `--wait-selector <selector>`, `--scroll-to-bottom`: give dynamic pages time or actions to reveal article content.
 - `--click-selector <selector...>`: click dismiss/expand selectors before extracting HTML.
 - `--headful`: show the browser window for debugging login, popups, or dynamic loading.
-- `--site-rules-dir <dir>`: load optional private TOML extraction/cleaning rules from a local directory, for example `skills/feedloom/site-rules/` reference folder.
+- `--site-rules-dir <dir>`: load optional private TOML extraction/cleaning rules from a local directory, for example `$HOME/.agents/skills/feedloom/site-rules/` reference folder.
 - `--solve-cloudflare`, `--proxy <server>`, `--dns-over-https`: use only when stealth fetching needs them.
 
 Run `npx -y @ariesfish/feedloom --help` for the complete option list. Do not invent unsupported options.
 
 ## Private site rules
 
-Site-specific TOML rules are intentionally optional and should not be assumed to be bundled with the package. If the user keeps private rules next to this skill, pass that directory explicitly:
+Site-specific TOML rules are optional in the package, but mandatory to use when present next to this skill. Always check for `$HOME/.agents/skills/feedloom/site-rules/` before clipping. If that directory exists, pass it explicitly on every Feedloom command using the `$HOME`-prefixed path:
 
 ```bash
-npx -y @ariesfish/feedloom "https://example.com/article" --site-rules-dir skills/feedloom/site-rules
+npx -y @ariesfish/feedloom "https://example.com/article" --site-rules-dir $HOME/.agents/skills/feedloom/site-rules
 ```
 
-Treat rule files in `skills/feedloom/site-rules/` as local reference material: use them only when present and relevant.
+Treat rule files in `$HOME/.agents/skills/feedloom/site-rules/` as local reference material and use them whenever available; never skip an existing site-rules directory unless the user explicitly asks not to use it.
 
 ## Output
 

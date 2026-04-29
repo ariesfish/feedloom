@@ -38,6 +38,10 @@ export interface RemovalProfileRules {
 export interface MetadataProfileRules {
   fixedAuthor?: string;
   titleSuffixPatterns?: string[];
+  authorSelectors?: string[];
+  authorMetaNames?: string[];
+  authorMetaItemprops?: string[];
+  authorMetaProperties?: string[];
 }
 
 export interface SiteProfile {

@@ -83,6 +83,47 @@ describe("Defuddle-backed cleanHtml", () => {
     expect(result.debug?.activeProfiles).toEqual(["demo"]);
   });
 
+  it("truncates from the top-level section containing a nested marker", async () => {
+    const profile = profileFromTomlRule("demo", {
+      match: { host_suffixes: ["example.com"] },
+      extract: { selectors: ["#content"] },
+      clean: { truncate: { after_contains: ["Newsletter marker"] } },
+    });
+
+    const result = await cleanHtml(
+      `<main id="content">
+        <article>${longParagraph()}</article>
+        <section class="signup-box"><div><h2>Newsletter marker</h2></div><p>signup form</p></section>
+        <footer>footer after marker</footer>
+      </main>`,
+      { baseUrl: "https://example.com/post", profiles: [profile] },
+    );
+
+    expect(result.content).toContain("meaningful article text");
+    expect(result.content).not.toContain("Newsletter marker");
+    expect(result.content).not.toContain("signup form");
+    expect(result.content).not.toContain("footer after marker");
+  });
+
+  it("fills missing author metadata from site profile selectors", async () => {
+    const profile = profileFromTomlRule("demo", {
+      match: { host_suffixes: ["example.com"] },
+      metadata: { author_selectors: [".byline .name"] },
+    });
+
+    const result = await cleanHtml(
+      `<!doctype html><html><head><title>Profile Author</title></head><body>
+        <article>
+          <p class="byline">By <span class="name">Site Author</span></p>
+          ${longParagraph()}
+        </article>
+      </body></html>`,
+      { baseUrl: "https://example.com/post", profiles: [profile] },
+    );
+
+    expect(result.metadata.author).toBe("Site Author");
+  });
+
   it("fills missing metadata from common meta tags and JSON-LD", async () => {
     const result = await cleanHtml(
       `<!doctype html><html lang="en"><head>

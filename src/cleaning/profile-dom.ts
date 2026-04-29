@@ -60,6 +60,24 @@ function removeTrailingSiblings(element: Element, removals: RemovalRecord[], rea
   }
 }
 
+function truncationCutPoint(root: Element, element: Element): Element {
+  let current = element;
+  let best = element;
+  while (current.parentElement && current.parentElement !== root) {
+    if (current.previousElementSibling) {
+      best = current;
+    }
+    current = current.parentElement;
+  }
+  return current.previousElementSibling ? current : best;
+}
+
+function truncateFromElement(root: Element, element: Element, removals: RemovalRecord[], reason: string): void {
+  const cutPoint = truncationCutPoint(root, element);
+  removeTrailingSiblings(cutPoint, removals, reason);
+  removeElement(removals, "site-profile:content-pattern", reason, cutPoint);
+}
+
 function compileProfileRegexes(profiles: SiteProfile[], key: "textRegexes" | "dropTextRegexes" | "cutAfterRegexes") {
   return profiles.flatMap((profile) =>
     (profile.removals?.[key] ?? []).map((pattern) => ({ profile: profile.name, regex: new RegExp(pattern, "i") })),
@@ -96,8 +114,7 @@ function removeByTextPatterns(root: Element, profiles: SiteProfile[], removals: 
       ? cutContains.find((entry) => text.includes(entry.marker)) ?? cutRegexes.find((entry) => entry.regex.test(text))
       : undefined;
     if (cut) {
-      removeTrailingSiblings(element, removals, cut.profile);
-      removeElement(removals, "site-profile:content-pattern", cut.profile, element);
+      truncateFromElement(root, element, removals, cut.profile);
       return;
     }
 

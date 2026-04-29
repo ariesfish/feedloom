@@ -71,6 +71,10 @@ export function profileFromTomlRule(name: string, rule: FeedloomTomlRule): SiteP
     metadata: {
       fixedAuthor: rule.metadata?.fixed_author,
       titleSuffixPatterns: rule.metadata?.strip_title_regexes,
+      authorSelectors: rule.metadata?.author_selectors,
+      authorMetaNames: rule.metadata?.author_meta_names,
+      authorMetaItemprops: rule.metadata?.author_meta_itemprops,
+      authorMetaProperties: rule.metadata?.author_meta_properties,
     },
   };
 }

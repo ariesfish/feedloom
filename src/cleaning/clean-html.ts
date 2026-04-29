@@ -83,7 +83,31 @@ function jsonLdValue(document: Document, keys: string[]): string | undefined {
   return undefined;
 }
 
-function toMetadata(result: DefuddleParseResult, document: Document): FeedloomMetadata {
+function profileAuthorFromDocument(document: Document, profiles: SiteProfile[]): string | undefined {
+  for (const profile of profiles) {
+    const metadata = profile.metadata;
+    if (!metadata) continue;
+
+    for (const selector of metadata.authorSelectors ?? []) {
+      const author = document.querySelector(selector)?.textContent?.replace(/\s+/g, " ").trim();
+      if (author) return author;
+    }
+
+    const metaNames = [
+      ...(metadata.authorMetaNames ?? []).map((value) => ({ attr: "name", value })),
+      ...(metadata.authorMetaItemprops ?? []).map((value) => ({ attr: "itemprop", value })),
+      ...(metadata.authorMetaProperties ?? []).map((value) => ({ attr: "property", value })),
+    ];
+    for (const entry of metaNames) {
+      const escaped = entry.value.replace(/"/g, "\\\"");
+      const author = document.querySelector(`meta[${entry.attr}="${escaped}"]`)?.getAttribute("content")?.trim();
+      if (author) return author;
+    }
+  }
+  return undefined;
+}
+
+function toMetadata(result: DefuddleParseResult, document: Document, profiles: SiteProfile[]): FeedloomMetadata {
   return {
     title: result.title || firstMetaContent(document, ["og:title", "twitter:title"]) || document.querySelector("title")?.textContent?.trim() || undefined,
     description: result.description || firstMetaContent(document, ["description", "og:description", "twitter:description"]),
@@ -92,7 +116,7 @@ function toMetadata(result: DefuddleParseResult, document: Document): FeedloomMe
     image: result.image || firstMetaContent(document, ["og:image", "twitter:image"]),
     language: result.language || document.documentElement.getAttribute("lang") || undefined,
     published: result.published || firstMetaContent(document, ["article:published_time", "date", "datePublished", "pubdate", "publishdate"]) || jsonLdValue(document, ["datePublished", "dateCreated"]),
-    author: result.author || firstMetaContent(document, ["author", "article:author", "twitter:creator"]) || jsonLdValue(document, ["author", "creator"]),
+    author: result.author || profileAuthorFromDocument(document, profiles) || firstMetaContent(document, ["author", "article:author", "twitter:creator"]) || jsonLdValue(document, ["author", "creator"]),
     site: result.site || firstMetaContent(document, ["og:site_name", "application-name"]),
     schemaOrgData: result.schemaOrgData,
     wordCount: result.wordCount,
@@ -143,7 +167,7 @@ export class HtmlCleaner {
     });
     const result = parser.parseAsync ? await parser.parseAsync() : parser.parse();
 
-    const metadata = toMetadata(result, document);
+    const metadata = toMetadata(result, document, activeProfiles);
     applyMetadataProfiles(metadata, activeProfiles);
     const content = serializeProfiledContent(result.content, postProfiles, removals);
 

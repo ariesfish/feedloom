@@ -19,17 +19,17 @@ jobs:
         with:
           node-version: 24
 
-      - name: Setup pnpm
-        run: npm install --global pnpm@10.33.2
+      - name: Verify pnpm
+        run: npx --yes pnpm@10.33.2 --version
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npx --yes pnpm@10.33.2 install --frozen-lockfile
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: npx --yes pnpm@10.33.2 typecheck
 
       - name: Test
-        run: pnpm test
+        run: npx --yes pnpm@10.33.2 test
 
       - name: Build
-        run: pnpm build
+        run: npx --yes pnpm@10.33.2 build

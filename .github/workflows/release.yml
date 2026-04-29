@@ -23,11 +23,11 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
 
-      - name: Setup pnpm
-        run: npm install --global pnpm@10.33.2
+      - name: Verify pnpm
+        run: npx --yes pnpm@10.33.2 --version
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npx --yes pnpm@10.33.2 install --frozen-lockfile
 
       - name: Verify tag matches package version
         run: |
@@ -38,13 +38,13 @@ jobs:
           fi
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: npx --yes pnpm@10.33.2 typecheck
 
       - name: Test
-        run: pnpm test
+        run: npx --yes pnpm@10.33.2 test
 
       - name: Build
-        run: pnpm build
+        run: npx --yes pnpm@10.33.2 build
 
       - name: Publish package
         run: npm publish --access public --provenance

@@ -40,7 +40,7 @@ describe("parseInputs", () => {
   });
 
   it("parses URL files and records source line numbers", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "feedloom-ts-inputs-"));
+    const dir = await mkdtemp(join(tmpdir(), "feedloom-inputs-"));
     const file = join(dir, "urls.md");
     try {
       await writeFile(file, "- [ ] https://example.com/1\ntext\n- [ ] https://example.com/2\n", "utf8");
@@ -60,7 +60,7 @@ describe("parseInputs", () => {
   });
 
   it("rejects empty URL files", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "feedloom-ts-inputs-"));
+    const dir = await mkdtemp(join(tmpdir(), "feedloom-inputs-"));
     const file = join(dir, "urls.md");
     try {
       await writeFile(file, "no urls here\n", "utf8");
@@ -73,7 +73,7 @@ describe("parseInputs", () => {
 
 describe("CheckboxFile", () => {
   it("marks matching unchecked URL lines as done", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "feedloom-ts-checkbox-"));
+    const dir = await mkdtemp(join(tmpdir(), "feedloom-checkbox-"));
     const file = join(dir, "urls.md");
     try {
       await writeFile(file, "- [ ] https://example.com/1\n- [x] https://example.com/2\n", "utf8");

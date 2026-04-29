@@ -178,7 +178,7 @@ async function solveCloudflare(page: Page): Promise<void> {
 }
 
 async function launchStealthContext(options: StealthFetchOptions): Promise<{ context: BrowserContext; userDataDir: string; ownsUserDataDir: boolean }> {
-  const userDataDir = options.userDataDir ?? (await mkdtemp(join(tmpdir(), "feedloom-ts-stealth-")));
+  const userDataDir = options.userDataDir ?? (await mkdtemp(join(tmpdir(), "feedloom-stealth-")));
   const ownsUserDataDir = options.userDataDir === undefined;
   const context = await chromium.launchPersistentContext(userDataDir, {
     channel: "chromium",

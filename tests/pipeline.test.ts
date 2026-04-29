@@ -12,7 +12,7 @@ function longParagraph(): string {
 
 describe("processItem", () => {
   it("writes a markdown note with frontmatter from fetched HTML", async () => {
-    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-ts-pipeline-"));
+    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-pipeline-"));
     try {
       const result = await processItem(
         { url: "https://example.com/demo", sourceKind: "html-page" },
@@ -39,7 +39,7 @@ describe("processItem", () => {
   });
 
   it("uses feed publishedAt as created fallback when HTML has no published metadata", async () => {
-    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-ts-created-"));
+    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-created-"));
     try {
       const result = await processItem(
         {
@@ -63,15 +63,15 @@ describe("processItem", () => {
     }
   });
 
-  it("removes an existing note and matching asset directory before rewriting the same source URL", async () => {
-    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-ts-rerun-"));
+  it("removes an existing note and matching asset directory before regenerating the same source URL", async () => {
+    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-rerun-"));
     try {
       await mkdir(join(outputDir, "assets", "Old Title"), { recursive: true });
-      await writeFile(join(outputDir, "Old Title.md"), `---\nsource: "https://example.com/rewrite"\ncreated: "2020-01-01"\n---\n\nold body\n`, "utf8");
+      await writeFile(join(outputDir, "Old Title.md"), `---\nsource: "https://example.com/rerun"\ncreated: "2020-01-01"\n---\n\nold body\n`, "utf8");
       await writeFile(join(outputDir, "assets", "Old Title", "image-001.jpg"), "old", "utf8");
 
       const result = await processItem(
-        { url: "https://example.com/rewrite", sourceKind: "html-page" },
+        { url: "https://example.com/rerun", sourceKind: "html-page" },
         {
           outputDir,
           staticFetch: async () => `<!doctype html><html><head><title>New Title</title></head><body><article>${longParagraph()}</article></body></html>`,

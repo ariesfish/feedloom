@@ -8,8 +8,8 @@ import { copyBrowserState } from "../../src/fetch/browser-state.js";
 
 describe("copyBrowserState", () => {
   it("copies root state files and profile while ignoring locks and caches", async () => {
-    const root = await mkdtemp(join(tmpdir(), "feedloom-ts-chrome-root-"));
-    const dest = await mkdtemp(join(tmpdir(), "feedloom-ts-chrome-copy-"));
+    const root = await mkdtemp(join(tmpdir(), "feedloom-chrome-root-"));
+    const dest = await mkdtemp(join(tmpdir(), "feedloom-chrome-copy-"));
     try {
       await writeFile(join(root, "Local State"), "local-state", "utf8");
       await writeFile(join(root, "First Run"), "first-run", "utf8");
@@ -37,8 +37,8 @@ describe("copyBrowserState", () => {
   });
 
   it("raises a clear error when the requested profile is missing", async () => {
-    const root = await mkdtemp(join(tmpdir(), "feedloom-ts-chrome-root-"));
-    const dest = await mkdtemp(join(tmpdir(), "feedloom-ts-chrome-copy-"));
+    const root = await mkdtemp(join(tmpdir(), "feedloom-chrome-root-"));
+    const dest = await mkdtemp(join(tmpdir(), "feedloom-chrome-copy-"));
     try {
       await expect(copyBrowserState(root, dest, "Default")).rejects.toThrow("Chrome profile not found");
     } finally {

@@ -172,7 +172,7 @@ The repository already ignores several of these in `.gitignore`. If new generate
 
 ## Safety and Ethics
 
-Feedloom TS is intended for personal archiving and legitimate content extraction workflows.
+Feedloom is intended for personal archiving and legitimate content extraction workflows.
 
 Agents should not introduce defaults or examples that encourage abusive scraping. Keep examples conservative and remind users to respect site terms, copyright, robots policies, authentication boundaries, and reasonable request rates.
 

@@ -102,7 +102,7 @@ describe("Defuddle-backed cleanHtml", () => {
   });
 
   it("loads standard site profiles from user-provided TOML files", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "feedloom-ts-profiles-"));
+    const dir = await mkdtemp(join(tmpdir(), "feedloom-profiles-"));
     const path = join(dir, "demo.toml");
     try {
       await writeFile(

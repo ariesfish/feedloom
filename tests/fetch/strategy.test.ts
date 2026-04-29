@@ -148,7 +148,7 @@ describe("fetchHtml", () => {
   });
 
   it("writes the latest successful HTML attempt to outputPath", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "feedloom-ts-strategy-test-"));
+    const dir = await mkdtemp(join(tmpdir(), "feedloom-strategy-test-"));
     const outputPath = join(dir, "page.html");
     try {
       const html = await fetchHtml(URL, {

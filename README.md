@@ -65,7 +65,7 @@ To make the CLI available globally on your machine:
 
 ```bash
 pnpm link --global
-feedloom-ts --help
+feedloom --help
 ```
 
 ## Quick Start
@@ -269,7 +269,7 @@ pnpm test
 
 ## Acknowledgements
 
-Feedloom TS is inspired by several excellent open-source projects. Special thanks to:
+Feedloom is inspired by several excellent open-source projects. Special thanks to:
 
 - [Defuddle](https://github.com/kepano/defuddle), for high-quality readable content extraction ideas.
 - [Patchright](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright), for inspiring robust browser automation and realistic page access.

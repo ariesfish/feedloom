@@ -1,11 +1,12 @@
 {
-  "name": "ts-feedloom",
-  "version": "0.0.0",
+  "name": "feedloom",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "TypeScript rewrite spike for feedloom using Patchright, Defuddle, Linkedom, and Turndown.",
+  "author": "ariesfish",
+  "description": "Archive long-form web content as clean Markdown with local assets.",
   "bin": {
-    "feedloom-ts": "./dist/cli.js"
+    "feedloom": "./dist/cli.js"
   },
   "scripts": {
     "dev": "tsx src/cli.ts",

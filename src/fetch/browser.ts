@@ -66,7 +66,7 @@ async function runPageActions(page: Page, options: BrowserFetchOptions): Promise
 }
 
 async function launchBrowserContext(options: BrowserFetchOptions): Promise<{ context: BrowserContext; userDataDir: string; ownsUserDataDir: boolean }> {
-  const userDataDir = options.userDataDir ?? (await mkdtemp(join(tmpdir(), "feedloom-ts-browser-")));
+  const userDataDir = options.userDataDir ?? (await mkdtemp(join(tmpdir(), "feedloom-browser-")));
   const ownsUserDataDir = options.userDataDir === undefined;
   const realChromeDefaults = options.realChromeDefaults ?? false;
   const extraArgs = realChromeDefaults

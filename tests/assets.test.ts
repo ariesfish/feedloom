@@ -8,7 +8,7 @@ import { localizeImages } from "../src/assets.js";
 
 describe("localizeImages", () => {
   it("downloads images once and rewrites img src to local assets", async () => {
-    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-ts-assets-"));
+    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-assets-"));
     let calls = 0;
     try {
       const html = await localizeImages('<p><img src="/demo.png"><img src="https://example.com/demo.png"></p>', {
@@ -30,7 +30,7 @@ describe("localizeImages", () => {
   });
 
   it("uses lazy image attributes and skips non-image responses", async () => {
-    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-ts-assets-"));
+    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-assets-"));
     try {
       const html = await localizeImages('<p><img data-src="/lazy.webp" srcset="/old.png 1x"><img src="/not-image"></p>', {
         outputDir,

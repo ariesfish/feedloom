@@ -47,9 +47,9 @@ function positiveIntOption(value: unknown, fallback: number): number {
 }
 
 program
-  .name("feedloom-ts")
-  .description("TypeScript rewrite spike for feedloom")
-  .version("0.0.0")
+  .name("feedloom")
+  .description("Archive long-form web content as clean Markdown with local assets")
+  .version("0.1.0")
   .option("--output-dir <dir>", "Output directory for markdown notes", "clippings")
   .option("--source-kind <kind>", "auto, html-page, or rss-feed", "auto")
   .option("--since <date>", "Only keep feed entries on or after YYYY-MM-DD", "")

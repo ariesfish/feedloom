@@ -81,7 +81,7 @@ export async function copyBrowserState(sourceRoot: string, destRoot: string, pro
 }
 
 export async function fetchBrowserHtmlWithBrowserState(url: string, config: BrowserStateConfig): Promise<string> {
-  const stateCopy = await mkdtemp(join(tmpdir(), "feedloom-ts-browser-state-"));
+  const stateCopy = await mkdtemp(join(tmpdir(), "feedloom-browser-state-"));
   try {
     await copyBrowserState(config.userDataDir, stateCopy, config.profile);
     return await fetchBrowserHtml(url, {

@@ -1,18 +1,32 @@
 {
-  "name": "feedloom",
+  "name": "@ariesfish/feedloom",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "author": "ariesfish",
+  "license": "MIT",
   "description": "Archive long-form web content as clean Markdown with local assets.",
-  "bin": {
-    "feedloom": "./dist/cli.js"
+  "homepage": "https://github.com/ariesfish/feedloom#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ariesfish/feedloom.git"
   },
+  "bugs": {
+    "url": "https://github.com/ariesfish/feedloom/issues"
+  },
+  "bin": {
+    "feedloom": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "tsx src/cli.ts",
     "build": "tsup src/cli.ts --format esm --dts --clean",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepublishOnly": "pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",

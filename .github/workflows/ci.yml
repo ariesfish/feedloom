@@ -19,20 +19,20 @@ jobs:
         with:
           node-version: 24
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Verify pnpm
-        run: corepack pnpm --version
+      - name: Setup pnpm
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pnpm" pnpm@10.33.2
+          echo "PNPM=$RUNNER_TEMP/pnpm/node_modules/.bin/pnpm" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/pnpm/node_modules/.bin/pnpm" --version
 
       - name: Install dependencies
-        run: corepack pnpm install --frozen-lockfile
+        run: "$PNPM" install --frozen-lockfile
 
       - name: Typecheck
-        run: corepack pnpm typecheck
+        run: "$PNPM" typecheck
 
       - name: Test
-        run: corepack pnpm test
+        run: "$PNPM" test
 
       - name: Build
-        run: corepack pnpm build
+        run: "$PNPM" build

@@ -1,5 +1,0 @@
-[match]
-host_suffixes = ["mp.weixin.qq.com"]
-
-[extract]
-selectors = ["#js_content"]

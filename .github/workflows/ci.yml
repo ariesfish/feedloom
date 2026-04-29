@@ -19,17 +19,20 @@ jobs:
         with:
           node-version: 24
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Verify pnpm
-        run: npx --yes pnpm@10.33.2 --version
+        run: corepack pnpm --version
 
       - name: Install dependencies
-        run: npx --yes pnpm@10.33.2 install --frozen-lockfile
+        run: corepack pnpm install --frozen-lockfile
 
       - name: Typecheck
-        run: npx --yes pnpm@10.33.2 typecheck
+        run: corepack pnpm typecheck
 
       - name: Test
-        run: npx --yes pnpm@10.33.2 test
+        run: corepack pnpm test
 
       - name: Build
-        run: npx --yes pnpm@10.33.2 build
+        run: corepack pnpm build

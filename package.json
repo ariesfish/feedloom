@@ -26,7 +26,7 @@
     "build": "tsup src/cli.ts --format esm --dts --clean",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "prepublishOnly": "pnpm typecheck && pnpm test && pnpm build"
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",

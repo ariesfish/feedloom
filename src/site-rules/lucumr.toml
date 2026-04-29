@@ -1,0 +1,15 @@
+[match]
+host_suffixes = ["lucumr.pocoo.org"]
+
+[extract]
+selectors = ["div.body", "article"]
+
+[metadata]
+fixed_author = "Armin Ronacher"
+strip_title_regexes = ["\\s*[|\\-]\\s*Armin Ronacher'?s Thoughts and Writings\\s*$"]
+
+[clean.remove]
+selectors = [".header-image", ".header", ".navigation", ".footer-image", ".footer", "p.theme-selector"]
+
+[clean.truncate]
+after_contains = ["This entry was tagged", "copy as", "view markdown", "© Copyright"]

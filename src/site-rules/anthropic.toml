@@ -1,0 +1,9 @@
+[match]
+host_suffixes = ["anthropic.com"]
+
+[extract]
+selectors = ["article"]
+
+[metadata]
+fixed_author = "Anthropic"
+strip_title_regexes = ["\\s*(?:\\\\|\\||/)\\s*Anthropic\\s*$"]

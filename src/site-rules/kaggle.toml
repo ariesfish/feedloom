@@ -1,0 +1,16 @@
+[match]
+host_suffixes = ["kaggle.com"]
+
+[extract]
+selectors = ["div:has(> h1):has(> p)", "article", "main", "section", "div"]
+
+[metadata]
+strip_title_regexes = ["\\s*\\|\\s*Kaggle\\s*$"]
+
+[clean.remove]
+selectors = ["div:has(img[alt='yay'])"]
+text_contains = ["Kaggle uses cookies", "OK, Got it.", "Solution Writeup", "replyReply", "Topic Author", "Hotness", "Sharemore_horiz"]
+
+[clean.truncate]
+after_regexes = ["^## \\d+ Comments$", "^## Comments$", "^Author$", "^Share$", "^comment$"]
+

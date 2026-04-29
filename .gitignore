@@ -5,6 +5,5 @@ coverage/
 .DS_Store
 
 outputs/
-site-rules/
 MEMORY.md
 src/site-rules/

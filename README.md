@@ -1,8 +1,6 @@
 # Feedloom
 
-Feedloom is a command-line tool for archiving long-form web content. It takes article URLs, URL list files, or RSS/Atom feeds, extracts readable article content, converts it to Markdown with YAML frontmatter, and saves page images as local assets. It is designed for personal knowledge bases, Obsidian vaults, and offline reading archives.
-
-This project is currently a TypeScript rewrite and validation spike, but it is already usable as a local CLI.
+Feedloom is a command-line tool for archiving long-form web content. It takes article URLs, URL list files, or RSS/Atom feeds, extracts readable article content, converts it to Markdown with YAML frontmatter, and saves page images as local assets. It is designed for personal knowledge bases, notebook vaults, and offline reading archives.
 
 ## Features
 

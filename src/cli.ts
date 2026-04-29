@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
 import { readdir } from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join, resolve } from "node:path";
 
 import { Command } from "commander";
 
@@ -15,27 +14,9 @@ import { ProgressTracker } from "./tracking.js";
 
 const program = new Command();
 
-async function standardSiteRulePaths(): Promise<string[]> {
-  const here = dirname(fileURLToPath(import.meta.url));
-  const candidates = [
-    resolve(here, "../src/site-rules"),
-    resolve(here, "../../src/site-rules"),
-    resolve(process.cwd(), "src/site-rules"),
-    resolve(here, "../../src/feedloom/site_rules"),
-    resolve(process.cwd(), "../src/feedloom/site_rules"),
-    resolve(process.cwd(), "src/feedloom/site_rules"),
-  ];
-  for (const dir of candidates) {
-    try {
-      const names = await readdir(dir);
-      return names.filter((name) => name.endsWith(".toml")).map((name) => join(dir, name));
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-        throw error;
-      }
-    }
-  }
-  return [];
+async function siteRulePathsFromDir(dir: string): Promise<string[]> {
+  const names = await readdir(dir);
+  return names.filter((name) => name.endsWith(".toml")).map((name) => join(dir, name));
 }
 
 function positiveIntOption(value: unknown, fallback: number): number {
@@ -71,6 +52,7 @@ program
   .option("--click-selector <selector...>", "Click one or more selectors after page load", [])
   .option("--scroll-to-bottom", "Scroll to the bottom before reading HTML", false)
   .option("--headful", "Run browser/browser-state fetches with a visible Chrome window", false)
+  .option("--site-rules-dir <dir>", "Optional directory of private TOML site extraction/cleaning rules", "")
   .option("--no-real-chrome-defaults", "Disable Scrapling-inspired real Chrome context defaults")
   .option("--no-reuse-browser", "Disable batch browser/stealth context reuse")
   .argument("[inputs...]", "URLs or files containing URLs")
@@ -102,7 +84,8 @@ program
         positiveIntOption(options.end, 0),
         positiveIntOption(options.limit, 0),
       );
-      const profiles = await loadSiteProfiles(await standardSiteRulePaths());
+      const siteRulesDir = String(options.siteRulesDir || "");
+      const profiles = siteRulesDir ? await loadSiteProfiles(await siteRulePathsFromDir(resolve(siteRulesDir))) : [];
       const outputDir = String(options.outputDir ?? "clippings");
       let failures = 0;
       const tracker = new ProgressTracker(selected, outputDir);

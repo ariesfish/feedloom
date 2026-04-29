@@ -258,6 +258,7 @@ Only use this on your own device and accounts. Always respect the target site's 
 --prefer-browser-state          Try local Chrome user state first
 --chrome-user-data-dir <path>   Chrome User Data directory
 --chrome-profile <name>         Chrome profile name. Default: Default
+--site-rules-dir <dir>          Optional directory of private TOML site rules
 ```
 
 For the full option list, run:
@@ -280,7 +281,7 @@ npm test
 - Respect robots.txt, website terms of service, copyright, and rate limits.
 - For dynamic pages, try `--fetch-mode browser` first.
 - For static blogs and news sites, `--fetch-mode static` is usually faster.
-- If article extraction is poor for a specific site, add or adjust a site rule in `src/site-rules/`.
+- If article extraction is poor for a specific site, keep private TOML site rules outside the package and pass them with `--site-rules-dir <dir>`.
 - For large batches, test with `--limit` before running the full job.
 
 ## Acknowledgements

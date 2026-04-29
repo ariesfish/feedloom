@@ -56,9 +56,20 @@ Use the least expensive mode that works:
 - `--wait-ms <ms>`, `--wait-selector <selector>`, `--scroll-to-bottom`: give dynamic pages time or actions to reveal article content.
 - `--click-selector <selector...>`: click dismiss/expand selectors before extracting HTML.
 - `--headful`: show the browser window for debugging login, popups, or dynamic loading.
+- `--site-rules-dir <dir>`: load optional private TOML extraction/cleaning rules from a local directory, for example `skills/feedloom/site-rules/` reference folder.
 - `--solve-cloudflare`, `--proxy <server>`, `--dns-over-https`: use only when stealth fetching needs them.
 
 Run `npx -y @ariesfish/feedloom --help` for the complete option list. Do not invent unsupported options.
+
+## Private site rules
+
+Site-specific TOML rules are intentionally optional and should not be assumed to be bundled with the package. If the user keeps private rules next to this skill, pass that directory explicitly:
+
+```bash
+npx -y @ariesfish/feedloom "https://example.com/article" --site-rules-dir skills/feedloom/site-rules
+```
+
+Treat rule files in `skills/feedloom/site-rules/` as local reference material: use them only when present and relevant.
 
 ## Output
 

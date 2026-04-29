@@ -13,7 +13,7 @@ The package is an ESM Node.js CLI targeting Node.js 24+.
 - Runtime: Node.js >= 24
 - Language: TypeScript
 - Module system: ESM (`"type": "module"`)
-- Package manager: pnpm
+- Package manager: npm
 - CLI framework: Commander
 - Build: tsup
 - Type checking: TypeScript
@@ -24,33 +24,33 @@ The package is an ESM Node.js CLI targeting Node.js 24+.
 
 ## Common Commands
 
-Use pnpm for all package scripts.
+Use npm for package scripts.
 
 ```bash
-pnpm install
-pnpm build
-pnpm typecheck
-pnpm test
-pnpm dev -- --help
+npm install
+npm run build
+npm run typecheck
+npm test
+npm run dev -- --help
 ```
 
 Run the CLI from source:
 
 ```bash
-pnpm dev -- --output-dir ./outputs "https://example.com/article"
+npm run dev -- --output-dir ./outputs "https://example.com/article"
 ```
 
 Run the built CLI:
 
 ```bash
-pnpm build
+npm run build
 node dist/cli.js --output-dir ./outputs "https://example.com/article"
 ```
 
 Install Patchright Chromium when browser-based tests or manual browser fetching are needed:
 
 ```bash
-pnpm exec patchright install chromium
+npx patchright install chromium
 ```
 
 ## Repository Layout
@@ -127,14 +127,14 @@ README.md               User-facing documentation
 - Before finishing substantive changes, run:
 
 ```bash
-pnpm typecheck
-pnpm test
+npm run typecheck
+npm test
 ```
 
 If a change touches the build or CLI entry point, also run:
 
 ```bash
-pnpm build
+npm run build
 ```
 
 ## Dependency Guidelines
@@ -143,7 +143,7 @@ pnpm build
 - Prefer built-in Node.js APIs when sufficient.
 - Keep CLI startup reasonably fast.
 - If adding a runtime dependency, update `package.json`, lockfile, and README/AGENTS notes when relevant.
-- Use `pnpm` so `pnpm-lock.yaml` stays consistent.
+- Use `npm` so `package-lock.json` stays consistent.
 
 ## Generated and Ignored Files
 
@@ -181,9 +181,9 @@ Agents should not introduce defaults or examples that encourage abusive scraping
 For non-trivial changes, verify as much as practical:
 
 ```bash
-pnpm typecheck
-pnpm test
-pnpm build
+npm run typecheck
+npm test
+npm run build
 ```
 
 Then summarize:

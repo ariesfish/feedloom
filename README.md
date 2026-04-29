@@ -17,7 +17,7 @@ Feedloom is a command-line tool for archiving long-form web content. It takes ar
 ## Requirements
 
 - Node.js >= 24
-- pnpm
+- npm
 - macOS, Linux, or Windows should work; browser-based fetching depends on Patchright/Chromium.
 
 ## Installation
@@ -32,7 +32,7 @@ cd feedloom
 ### 2. Install dependencies
 
 ```bash
-pnpm install
+npm install
 ```
 
 ### 3. Install the browser runtime
@@ -40,13 +40,13 @@ pnpm install
 If you plan to use `browser`, `stealth`, or the browser fallback in `auto` mode, install the Patchright Chromium runtime:
 
 ```bash
-pnpm exec patchright install chromium
+npx patchright install chromium
 ```
 
 ### 4. Build the CLI
 
 ```bash
-pnpm build
+npm run build
 ```
 
 After building, run:
@@ -58,13 +58,13 @@ node dist/cli.js --help
 During development, you can run the TypeScript source directly:
 
 ```bash
-pnpm dev -- --help
+npm run dev -- --help
 ```
 
 To make the CLI available globally on your machine:
 
 ```bash
-pnpm link --global
+npm link
 feedloom --help
 ```
 
@@ -73,13 +73,13 @@ feedloom --help
 Archive a single article to the default `clippings/` directory:
 
 ```bash
-pnpm dev -- "https://example.com/article"
+npm run dev -- "https://example.com/article"
 ```
 
 Write output to a custom directory:
 
 ```bash
-pnpm dev -- --output-dir ./outputs "https://example.com/article"
+npm run dev -- --output-dir ./outputs "https://example.com/article"
 ```
 
 Use the built CLI:
@@ -109,7 +109,7 @@ Images are downloaded into an `assets/` subdirectory under the output directory 
 ### Pass multiple URLs directly
 
 ```bash
-pnpm dev -- \
+npm run dev -- \
   "https://example.com/a" \
   "https://example.com/b"
 ```
@@ -126,7 +126,7 @@ pnpm dev -- \
 Run:
 
 ```bash
-pnpm dev -- --output-dir ./outputs urls.md
+npm run dev -- --output-dir ./outputs urls.md
 ```
 
 After a URL is processed successfully, the matching checklist item is updated automatically:
@@ -140,14 +140,14 @@ After a URL is processed successfully, the matching checklist item is updated au
 By default, `--source-kind auto` tries to detect whether the input is a normal HTML page or a feed. You can also specify the source kind explicitly:
 
 ```bash
-pnpm dev -- --source-kind rss-feed --since 2026-01-01 "https://example.com/feed.xml"
+npm run dev -- --source-kind rss-feed --since 2026-01-01 "https://example.com/feed.xml"
 ```
 
 Useful slicing options:
 
 ```bash
-pnpm dev -- --start 1 --end 10 "https://example.com/feed.xml"
-pnpm dev -- --limit 5 "https://example.com/feed.xml"
+npm run dev -- --start 1 --end 10 "https://example.com/feed.xml"
+npm run dev -- --limit 5 "https://example.com/feed.xml"
 ```
 
 ## Fetch Modes
@@ -164,8 +164,8 @@ Use `--fetch-mode` to control how pages are fetched:
 Examples:
 
 ```bash
-pnpm dev -- --fetch-mode browser "https://example.com/article"
-pnpm dev -- --fetch-mode stealth --solve-cloudflare "https://example.com/article"
+npm run dev -- --fetch-mode browser "https://example.com/article"
+npm run dev -- --fetch-mode stealth --solve-cloudflare "https://example.com/article"
 ```
 
 ## Browser Options
@@ -173,37 +173,37 @@ pnpm dev -- --fetch-mode stealth --solve-cloudflare "https://example.com/article
 Wait longer after page load:
 
 ```bash
-pnpm dev -- --fetch-mode browser --wait-ms 5000 "https://example.com/article"
+npm run dev -- --fetch-mode browser --wait-ms 5000 "https://example.com/article"
 ```
 
 Wait for a selector before extracting content:
 
 ```bash
-pnpm dev -- --fetch-mode browser --wait-selector "article" "https://example.com/article"
+npm run dev -- --fetch-mode browser --wait-selector "article" "https://example.com/article"
 ```
 
 Click popups or expand buttons before extraction:
 
 ```bash
-pnpm dev -- --fetch-mode browser --click-selector "button.accept" --click-selector ".expand" "https://example.com/article"
+npm run dev -- --fetch-mode browser --click-selector "button.accept" --click-selector ".expand" "https://example.com/article"
 ```
 
 Scroll to the bottom before extraction:
 
 ```bash
-pnpm dev -- --fetch-mode browser --scroll-to-bottom "https://example.com/article"
+npm run dev -- --fetch-mode browser --scroll-to-bottom "https://example.com/article"
 ```
 
 Use a proxy:
 
 ```bash
-pnpm dev -- --fetch-mode stealth --proxy "http://127.0.0.1:7890" "https://example.com/article"
+npm run dev -- --fetch-mode stealth --proxy "http://127.0.0.1:7890" "https://example.com/article"
 ```
 
 Run with a visible browser window for debugging:
 
 ```bash
-pnpm dev -- --fetch-mode browser --headful "https://example.com/article"
+npm run dev -- --fetch-mode browser --headful "https://example.com/article"
 ```
 
 ## Use Local Chrome Login State
@@ -211,7 +211,7 @@ pnpm dev -- --fetch-mode browser --headful "https://example.com/article"
 For pages that require an authenticated browser session, you can try using your local Chrome profile:
 
 ```bash
-pnpm dev -- \
+npm run dev -- \
   --prefer-browser-state \
   --chrome-user-data-dir "{CHROME_INSTALL_PATH}" \
   --chrome-profile "Default" \
@@ -247,16 +247,16 @@ Only use this on your own device and accounts. Always respect the target site's 
 For the full option list, run:
 
 ```bash
-pnpm dev -- --help
+npm run dev -- --help
 ```
 
 ## Development
 
 ```bash
-pnpm install
-pnpm build
-pnpm typecheck
-pnpm test
+npm install
+npm run build
+npm run typecheck
+npm test
 ```
 
 ## Tips and Notes

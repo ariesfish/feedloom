@@ -68,6 +68,22 @@ npm link
 feedloom --help
 ```
 
+## Agent Skill
+
+Feedloom ships an Agent Skill in `skills/feedloom`, so agents that support the `skills` CLI can install the clipping workflow directly from the package or repository:
+
+```bash
+npx skills add @ariesfish/feedloom --skill feedloom
+```
+
+For a global install across supported agents:
+
+```bash
+npx skills add @ariesfish/feedloom --skill feedloom --global
+```
+
+After installing the skill, ask your agent to save article URLs, URL lists, or RSS feeds as Markdown. The skill runs the CLI through `npx -y @ariesfish/feedloom` by default.
+
 ## Quick Start
 
 Archive a single article to the default `clippings/` directory:

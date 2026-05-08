@@ -63,6 +63,40 @@ describe("processItem", () => {
     }
   });
 
+  it("applies matching site profile fetch preferences before fetching HTML", async () => {
+    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-profile-fetch-"));
+    try {
+      const result = await processItem(
+        { url: "https://example.com/profile-fetch", sourceKind: "html-page" },
+        {
+          outputDir,
+          profiles: [
+            {
+              name: "demo",
+              match: { hostSuffixes: ["example.com"] },
+              fetch: { mode: "browser", preferBrowserState: true, scrollToBottom: true, waitMs: 8000 },
+            },
+          ],
+          browserStateDefaults: { userDataDir: "/tmp/chrome", profile: "Default" },
+          staticFetch: async () => {
+            throw new Error("static should not be used");
+          },
+          browserStateFetch: async (_url, config) => {
+            expect(config.userDataDir).toBe("/tmp/chrome");
+            expect(config.profile).toBe("Default");
+            expect(config.scrollToBottom).toBe(true);
+            expect(config.waitMs).toBe(8000);
+            return `<!doctype html><html><head><title>Profile Fetch</title></head><body><article>${longParagraph()}</article></body></html>`;
+          },
+        },
+      );
+
+      expect(result.title).toBe("Profile Fetch");
+    } finally {
+      await rm(outputDir, { recursive: true, force: true });
+    }
+  });
+
   it("removes an existing note and matching asset directory before regenerating the same source URL", async () => {
     const outputDir = await mkdtemp(join(tmpdir(), "feedloom-rerun-"));
     try {

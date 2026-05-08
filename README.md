@@ -281,7 +281,8 @@ npm test
 - Respect robots.txt, website terms of service, copyright, and rate limits.
 - For dynamic pages, try `--fetch-mode browser` first.
 - For static blogs and news sites, `--fetch-mode static` is usually faster.
-- If article extraction is poor for a specific site, keep private TOML site rules outside the package and pass them with `--site-rules-dir <dir>`.
+- Feedloom ships bundled TOML site rules for common dynamic/structured sites such as WeChat official account articles and Zhihu. Site rules can define extraction, cleanup, and fetch preferences. For example, the bundled Zhihu rule uses browser fetch with copied Chrome state when `--chrome-user-data-dir`/`--chrome-profile` are configured.
+- If article extraction is poor for a specific site, keep private TOML site rules outside the package and pass them with `--site-rules-dir <dir>`. Private rules are loaded after bundled rules.
 - For large batches, test with `--limit` before running the full job.
 
 ## Acknowledgements

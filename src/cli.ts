@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 import { readdir } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { Command } from "commander";
 
@@ -16,7 +17,11 @@ const program = new Command();
 
 async function siteRulePathsFromDir(dir: string): Promise<string[]> {
   const names = await readdir(dir);
-  return names.filter((name) => name.endsWith(".toml")).map((name) => join(dir, name));
+  return names.filter((name) => name.endsWith(".toml")).sort().map((name) => join(dir, name));
+}
+
+function builtinSiteRulesDir(): string {
+  return join(dirname(fileURLToPath(import.meta.url)), "site-rules");
 }
 
 function positiveIntOption(value: unknown, fallback: number): number {
@@ -85,7 +90,9 @@ program
         positiveIntOption(options.limit, 0),
       );
       const siteRulesDir = String(options.siteRulesDir || "");
-      const profiles = siteRulesDir ? await loadSiteProfiles(await siteRulePathsFromDir(resolve(siteRulesDir))) : [];
+      const builtinRulePaths = await siteRulePathsFromDir(builtinSiteRulesDir());
+      const customRulePaths = siteRulesDir ? await siteRulePathsFromDir(resolve(siteRulesDir)) : [];
+      const profiles = await loadSiteProfiles([...builtinRulePaths, ...customRulePaths]);
       const outputDir = String(options.outputDir ?? "clippings");
       let failures = 0;
       const tracker = new ProgressTracker(selected, outputDir);
@@ -105,6 +112,10 @@ program
         headless: !Boolean(options.headful),
         realChromeDefaults: options.realChromeDefaults !== false,
       };
+      const browserStateDefaults = {
+        userDataDir: String(options.chromeUserDataDir || ""),
+        profile: String(options.chromeProfile || "Default"),
+      };
       const sessions = options.reuseBrowser === false ? null : new BatchFetchSessions({
         browser: browserOptions,
         stealth: {
@@ -118,17 +129,11 @@ program
       for (const item of selected) {
         tracker.start(item.url);
         try {
-          const browserState = options.preferBrowserState
-            ? {
-                userDataDir: String(options.chromeUserDataDir || ""),
-                profile: String(options.chromeProfile || "Default"),
-                ...browserOptions,
-              }
-            : null;
           const result = await processItem(item, {
             outputDir,
             profiles,
-            browserState,
+            browserState: options.preferBrowserState ? { ...browserStateDefaults, ...browserOptions } : null,
+            browserStateDefaults,
             fetchMode,
             ...browserOptions,
             solveCloudflare: Boolean(options.solveCloudflare),

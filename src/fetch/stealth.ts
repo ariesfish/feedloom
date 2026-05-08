@@ -226,13 +226,13 @@ async function fetchWithStealthContext(context: BrowserContext, url: string, opt
       await page.locator(selector).first().click({ timeout: 5_000 }).catch(() => undefined);
     }
     if (options.scrollToBottom) {
-      await page.evaluate(async () => {
-        const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+      await page.evaluate(`(async () => {
+        const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
         for (let i = 0; i < 8; i += 1) {
           window.scrollTo(0, document.body.scrollHeight);
           await delay(250);
         }
-      });
+      })()`);
     }
     if (options.waitSelector) {
       await page.locator(options.waitSelector).first().waitFor({ state: options.waitSelectorState ?? "attached", timeout: timeoutMs }).catch(() => undefined);

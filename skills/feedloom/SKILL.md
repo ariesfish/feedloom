@@ -63,15 +63,19 @@ Use the least expensive mode that works:
 
 Run `npx -y @ariesfish/feedloom --help` for the complete option list. Do not invent unsupported options.
 
-## Private site rules
+## Site rules
 
-Site-specific TOML rules are optional in the package, but mandatory to use when present next to this skill. Always check for `$HOME/.agents/skills/feedloom/site-rules/` before clipping. If that directory exists, pass it explicitly on every Feedloom command using the `$HOME`-prefixed path:
+Feedloom ships built-in TOML site rules in the package for common sites such as WeChat and Zhihu. These are loaded automatically; do not pass a special option for built-in rules.
+
+Private skill rules are also supported and are mandatory to use when present next to this skill. Always check for `$HOME/.agents/skills/feedloom/site-rules/` before clipping. If that directory exists, pass it explicitly on every Feedloom command using the `$HOME`-prefixed path:
 
 ```bash
 npx -y @ariesfish/feedloom "https://example.com/article" --site-rules-dir $HOME/.agents/skills/feedloom/site-rules
 ```
 
 Treat rule files in `$HOME/.agents/skills/feedloom/site-rules/` as local reference material and use them whenever available; never skip an existing site-rules directory unless the user explicitly asks not to use it.
+
+For adding or editing private rules, read `references/site-rules.md`. It contains the TOML schema, examples, `[fetch]` behavior, and validation workflow.
 
 ## Output
 

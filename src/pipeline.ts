@@ -12,6 +12,10 @@ export interface ProcessItemOptions extends FetchHtmlOptions {
   profiles?: SiteProfile[];
   localizeAssets?: boolean;
   fetchImage?: typeof fetch;
+  browserStateDefaults?: {
+    userDataDir: string;
+    profile: string;
+  } | null;
 }
 
 export interface ProcessItemResult {
@@ -70,8 +74,39 @@ function resolveCreatedValue(item: UrlItem, published: string | undefined): stri
   return new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
 }
 
+function mergeProfileFetchOptions(options: ProcessItemOptions, profiles: SiteProfile[]): FetchHtmlOptions {
+  const merged: FetchHtmlOptions = { ...options };
+  for (const profile of profiles) {
+    if (profile.fetch?.mode) merged.fetchMode = profile.fetch.mode;
+    if (profile.fetch?.waitMs !== undefined) merged.waitMs = profile.fetch.waitMs;
+    if (profile.fetch?.networkIdle !== undefined) merged.networkIdle = profile.fetch.networkIdle;
+    if (profile.fetch?.waitSelector) merged.waitSelector = profile.fetch.waitSelector;
+    if (profile.fetch?.waitSelectorState) merged.waitSelectorState = profile.fetch.waitSelectorState;
+    if (profile.fetch?.clickSelectors) merged.clickSelectors = profile.fetch.clickSelectors;
+    if (profile.fetch?.scrollToBottom !== undefined) merged.scrollToBottom = profile.fetch.scrollToBottom;
+    if (profile.fetch?.preferBrowserState && options.browserStateDefaults) {
+      merged.browserState = {
+        ...options.browserStateDefaults,
+        waitMs: merged.waitMs,
+        networkIdle: merged.networkIdle,
+        proxy: merged.proxy,
+        dnsOverHttps: merged.dnsOverHttps,
+        waitSelector: merged.waitSelector,
+        waitSelectorState: merged.waitSelectorState,
+        clickSelectors: merged.clickSelectors,
+        scrollToBottom: merged.scrollToBottom,
+        headless: merged.headless,
+        realChromeDefaults: merged.realChromeDefaults,
+      };
+    }
+  }
+  return merged;
+}
+
 export async function processItem(item: UrlItem, options: ProcessItemOptions): Promise<ProcessItemResult> {
-  const html = await fetchHtml(item.url, options);
+  const urlProfiles = selectActiveProfiles(options.profiles, item.url, "");
+  const fetchOptions = mergeProfileFetchOptions(options, urlProfiles);
+  const html = await fetchHtml(item.url, fetchOptions);
   const activeProfiles = selectActiveProfiles(options.profiles, item.url, html);
   const cleaned = await cleanHtml(html, { baseUrl: item.url, profiles: options.profiles, activeProfiles });
   const title = cleaned.metadata.title || item.sourceTitle || titleFromUrl(item.url);

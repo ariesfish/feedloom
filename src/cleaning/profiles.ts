@@ -22,6 +22,16 @@ interface FeedloomTomlRule {
     author_meta_itemprops?: string[];
     author_meta_properties?: string[];
   };
+  fetch?: {
+    mode?: "auto" | "static" | "browser" | "stealth";
+    prefer_browser_state?: boolean;
+    wait_ms?: number;
+    network_idle?: boolean;
+    wait_selector?: string;
+    wait_selector_state?: "attached" | "detached" | "visible" | "hidden";
+    click_selectors?: string[];
+    scroll_to_bottom?: boolean;
+  };
   clean?: {
     remove?: {
       selectors?: string[];
@@ -76,7 +86,21 @@ export function profileFromTomlRule(name: string, rule: FeedloomTomlRule): SiteP
       authorMetaItemprops: rule.metadata?.author_meta_itemprops,
       authorMetaProperties: rule.metadata?.author_meta_properties,
     },
+    fetch: {
+      mode: rule.fetch?.mode,
+      preferBrowserState: rule.fetch?.prefer_browser_state,
+      waitMs: rule.fetch?.wait_ms,
+      networkIdle: rule.fetch?.network_idle,
+      waitSelector: rule.fetch?.wait_selector,
+      waitSelectorState: rule.fetch?.wait_selector_state,
+      clickSelectors: rule.fetch?.click_selectors,
+      scrollToBottom: rule.fetch?.scroll_to_bottom,
+    },
   };
+}
+
+export async function loadSiteProfilesFromToml(paths: string[]): Promise<SiteProfile[]> {
+  return loadSiteProfiles(paths);
 }
 
 export async function loadSiteProfiles(paths: string[]): Promise<SiteProfile[]> {

@@ -44,12 +44,24 @@ export interface MetadataProfileRules {
   authorMetaProperties?: string[];
 }
 
+export interface FetchProfileRules {
+  mode?: "auto" | "static" | "browser" | "stealth";
+  preferBrowserState?: boolean;
+  waitMs?: number;
+  networkIdle?: boolean;
+  waitSelector?: string;
+  waitSelectorState?: "attached" | "detached" | "visible" | "hidden";
+  clickSelectors?: string[];
+  scrollToBottom?: boolean;
+}
+
 export interface SiteProfile {
   name: string;
   match?: MatchProfileRules;
   content?: ContentProfileRules;
   removals?: RemovalProfileRules;
   metadata?: MetadataProfileRules;
+  fetch?: FetchProfileRules;
 }
 
 export interface HtmlCleaningOptions {

@@ -58,7 +58,7 @@ Supported sections:
 - `[match]`: `host_suffixes`, `host_regexes`, `url_regexes`, `html_markers`.
 - `[fetch]`: `mode`, `prefer_browser_state`, `wait_ms`, `network_idle`, `wait_selector`, `wait_selector_state`, `click_selectors`, `scroll_to_bottom`.
 - `[extract]`: `selectors`.
-- `[metadata]`: `fixed_author`, `strip_title_regexes`, `author_selectors`, `author_meta_names`, `author_meta_itemprops`, `author_meta_properties`.
+- `[metadata]`: `fixed_author`, `strip_title_regexes`, `strip_author_regexes`, `author_selectors`, `author_meta_names`, `author_meta_itemprops`, `author_meta_properties`.
 - `[clean.remove]`: `selectors`, `class_contains`, `id_contains`, `attr_contains`, `text_contains`, `text_regexes`, `exact_text`.
 - `[clean.truncate]`: `after_contains`, `after_regexes`.
 

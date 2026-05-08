@@ -124,11 +124,36 @@ function toMetadata(result: DefuddleParseResult, document: Document, profiles: S
   };
 }
 
-function serializeProfiledContent(content: string, profiles: SiteProfile[], removals: RemovalRecord[]): string {
-  const { document } = parseHTML(`<!doctype html><html><body><main data-feedloom-profile-root="true">${content}</main></body></html>`);
-  const root = document.querySelector('[data-feedloom-profile-root="true"]') ?? document.body;
+function appendMetaImages(document: Document, root: Element, profiles: SiteProfile[]): void {
+  const properties = profiles.flatMap((profile) => profile.media?.includeMetaImages
+    ? (profile.media.imageMetaProperties ?? ["og:image"])
+    : []);
+  if (properties.length === 0) {
+    return;
+  }
+
+  const seen = new Set(Array.from(root.querySelectorAll("img")).map((img) => img.getAttribute("src") ?? ""));
+  for (const property of properties) {
+    const escaped = property.replace(/"/g, "\\\"");
+    for (const meta of Array.from(document.querySelectorAll(`meta[property="${escaped}"], meta[name="${escaped}"], meta[itemprop="${escaped}"]`))) {
+      const src = meta.getAttribute("content")?.trim();
+      if (!src || seen.has(src)) continue;
+      const img = document.createElement("img");
+      img.setAttribute("src", src);
+      img.setAttribute("alt", "");
+      root.appendChild(document.createElement("p"));
+      root.lastElementChild?.appendChild(img);
+      seen.add(src);
+    }
+  }
+}
+
+function serializeProfiledContent(document: Document, content: string, profiles: SiteProfile[], removals: RemovalRecord[]): string {
+  const { document: contentDocument } = parseHTML(`<!doctype html><html><body><main data-feedloom-profile-root="true">${content}</main></body></html>`);
+  const root = contentDocument.querySelector('[data-feedloom-profile-root="true"]') ?? contentDocument.body;
+  appendMetaImages(document, root, profiles);
   applySiteProfiles(root, profiles, removals);
-  const serialized = root.innerHTML || root.outerHTML || document.body.innerHTML;
+  const serialized = root.innerHTML || root.outerHTML || contentDocument.body.innerHTML;
   return serialized.trim() ? `${serialized.trim()}\n` : "";
 }
 
@@ -169,7 +194,7 @@ export class HtmlCleaner {
 
     const metadata = toMetadata(result, document, activeProfiles);
     applyMetadataProfiles(metadata, activeProfiles);
-    const content = serializeProfiledContent(result.content, postProfiles, removals);
+    const content = serializeProfiledContent(document, result.content, postProfiles, removals);
 
     return {
       content,

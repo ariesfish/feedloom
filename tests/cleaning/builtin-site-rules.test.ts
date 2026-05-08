@@ -7,7 +7,11 @@ import { cleanHtml } from "../../src/cleaning/clean-html.js";
 import { loadSiteProfiles } from "../../src/cleaning/profiles.js";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const builtinRulePaths = [join(repoRoot, "src", "site-rules", "wechat.toml"), join(repoRoot, "src", "site-rules", "zhihu.toml")];
+const builtinRulePaths = [
+  join(repoRoot, "src", "site-rules", "wechat.toml"),
+  join(repoRoot, "src", "site-rules", "xiaohongshu.toml"),
+  join(repoRoot, "src", "site-rules", "zhihu.toml"),
+];
 
 function longParagraph(): string {
   return `<p>${"This is meaningful article text, ".repeat(80)}</p>`;
@@ -17,9 +21,13 @@ describe("built-in TOML site rules", () => {
   it("loads common site profiles from bundled TOML files", async () => {
     const profiles = await loadSiteProfiles(builtinRulePaths);
 
-    expect(profiles.map((profile) => profile.name)).toEqual(["wechat", "zhihu"]);
+    expect(profiles.map((profile) => profile.name)).toEqual(["wechat", "xiaohongshu", "zhihu"]);
     expect(profiles.find((profile) => profile.name === "wechat")?.content?.selectors).toContain("#js_content");
     expect(profiles.find((profile) => profile.name === "zhihu")?.metadata?.titleSuffixPatterns).toContain("\\s*-\\s*知乎\\s*$");
+    expect(profiles.find((profile) => profile.name === "xiaohongshu")?.media).toMatchObject({
+      includeMetaImages: true,
+      imageMetaProperties: ["og:image"],
+    });
     expect(profiles.find((profile) => profile.name === "zhihu")?.fetch).toMatchObject({
       mode: "browser",
       preferBrowserState: true,

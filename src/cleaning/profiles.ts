@@ -17,6 +17,7 @@ interface FeedloomTomlRule {
   metadata?: {
     fixed_author?: string;
     strip_title_regexes?: string[];
+    strip_author_regexes?: string[];
     author_selectors?: string[];
     author_meta_names?: string[];
     author_meta_itemprops?: string[];
@@ -31,6 +32,10 @@ interface FeedloomTomlRule {
     wait_selector_state?: "attached" | "detached" | "visible" | "hidden";
     click_selectors?: string[];
     scroll_to_bottom?: boolean;
+  };
+  media?: {
+    include_meta_images?: boolean;
+    image_meta_properties?: string[];
   };
   clean?: {
     remove?: {
@@ -81,6 +86,7 @@ export function profileFromTomlRule(name: string, rule: FeedloomTomlRule): SiteP
     metadata: {
       fixedAuthor: rule.metadata?.fixed_author,
       titleSuffixPatterns: rule.metadata?.strip_title_regexes,
+      authorSuffixPatterns: rule.metadata?.strip_author_regexes,
       authorSelectors: rule.metadata?.author_selectors,
       authorMetaNames: rule.metadata?.author_meta_names,
       authorMetaItemprops: rule.metadata?.author_meta_itemprops,
@@ -95,6 +101,10 @@ export function profileFromTomlRule(name: string, rule: FeedloomTomlRule): SiteP
       waitSelectorState: rule.fetch?.wait_selector_state,
       clickSelectors: rule.fetch?.click_selectors,
       scrollToBottom: rule.fetch?.scroll_to_bottom,
+    },
+    media: {
+      includeMetaImages: rule.media?.include_meta_images,
+      imageMetaProperties: rule.media?.image_meta_properties,
     },
   };
 }

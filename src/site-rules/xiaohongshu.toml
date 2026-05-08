@@ -1,0 +1,55 @@
+[match]
+host_suffixes = ["xiaohongshu.com"]
+
+[fetch]
+mode = "auto"
+scroll_to_bottom = true
+wait_ms = 5000
+
+[extract]
+selectors = [".note-content", "#noteContainer", ".note-container", ".note-detail"]
+
+[metadata]
+strip_title_regexes = ["\\s*-\\s*小红书\\s*$"]
+strip_author_regexes = ["关注$"]
+author_selectors = [".author-container .username", ".author-wrapper .name", ".user-name"]
+author_meta_names = ["author"]
+author_meta_properties = ["article:author"]
+
+[media]
+include_meta_images = true
+image_meta_properties = ["og:image"]
+
+[clean.remove]
+selectors = [
+  ".side-bar",
+  ".left-container",
+  ".comments-el",
+  ".interactions",
+  ".engage-bar",
+  ".note-detail-dropdown",
+  ".close-circle",
+  ".close-box",
+  ".login-container",
+  ".bottom-container .notedetail-menu",
+  ".author",
+  ".author-container",
+  ".media-container",
+  ".fraction",
+  ".arrow-controller",
+  ".pagination-media-container"
+]
+text_contains = [
+  "创作中心",
+  "业务合作",
+  "沪ICP备",
+  "营业执照",
+  "违法不良信息举报电话",
+  "行吟信息科技",
+  "小红书网页版",
+  "登录后推荐更懂你的笔记"
+]
+exact_text = ["关注", "加载中", "更多", "发现", "直播", "发布", "通知"]
+
+[clean.truncate]
+after_regexes = ["^共 \\d+ 条评论$", "^相关推荐$", "^登录后推荐更懂你的笔记$"]

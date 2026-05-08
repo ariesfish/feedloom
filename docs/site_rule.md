@@ -69,6 +69,7 @@ selectors = ["article", "main"]
 [metadata]
 fixed_author = "Example"
 strip_title_regexes = ["\\s*| Example\\s*$"]
+strip_author_regexes = ["关注$"]
 author_selectors = []
 author_meta_names = ["author"]
 author_meta_itemprops = ["author"]
@@ -170,6 +171,7 @@ Supported fields:
 - `fixed_author`
 - `strip_title_regexes`
 - `author_selectors`
+- `strip_author_regexes`
 - `author_meta_names`
 - `author_meta_itemprops`
 - `author_meta_properties`

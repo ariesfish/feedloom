@@ -154,6 +154,19 @@ function cleanupTitle(metadata: { title?: string }, profiles: SiteProfile[]): vo
   metadata.title = title;
 }
 
+function cleanupAuthor(metadata: { author?: string }, profiles: SiteProfile[]): void {
+  if (!metadata.author) {
+    return;
+  }
+  let author = metadata.author;
+  for (const profile of profiles) {
+    for (const pattern of profile.metadata?.authorSuffixPatterns ?? []) {
+      author = author.replace(new RegExp(pattern, "i"), "").trim();
+    }
+  }
+  metadata.author = author;
+}
+
 export function applySiteProfiles(root: Element, profiles: SiteProfile[], removals: RemovalRecord[]): void {
   removeByExactSelectors(root, profiles, removals);
   removeByPartialAttributePatterns(root, profiles, removals);
@@ -163,4 +176,5 @@ export function applySiteProfiles(root: Element, profiles: SiteProfile[], remova
 export function applyMetadataProfiles(metadata: { title?: string; author?: string }, profiles: SiteProfile[]): void {
   applyFixedAuthor(metadata, profiles);
   cleanupTitle(metadata, profiles);
+  cleanupAuthor(metadata, profiles);
 }

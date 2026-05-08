@@ -142,6 +142,25 @@ describe("Defuddle-backed cleanHtml", () => {
     expect(result.metadata.language).toBe("en");
   });
 
+  it("appends profile-enabled meta images to extracted content", async () => {
+    const profile = profileFromTomlRule("demo", {
+      match: { host_suffixes: ["example.com"] },
+      extract: { selectors: ["#content"] },
+      media: { include_meta_images: true, image_meta_properties: ["og:image"] },
+    });
+
+    const result = await cleanHtml(
+      `<!doctype html><html><head>
+        <meta property="og:image" content="https://cdn.example.com/a.jpg">
+        <meta property="og:image" content="https://cdn.example.com/b.jpg">
+      </head><body><div id="content">${longParagraph()}</div></body></html>`,
+      { baseUrl: "https://example.com/post", profiles: [profile] },
+    );
+
+    expect(result.content).toContain('src="https://cdn.example.com/a.jpg"');
+    expect(result.content).toContain('src="https://cdn.example.com/b.jpg"');
+  });
+
   it("loads standard site profiles from user-provided TOML files", async () => {
     const dir = await mkdtemp(join(tmpdir(), "feedloom-profiles-"));
     const path = join(dir, "demo.toml");

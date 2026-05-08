@@ -38,6 +38,7 @@ export interface RemovalProfileRules {
 export interface MetadataProfileRules {
   fixedAuthor?: string;
   titleSuffixPatterns?: string[];
+  authorSuffixPatterns?: string[];
   authorSelectors?: string[];
   authorMetaNames?: string[];
   authorMetaItemprops?: string[];
@@ -55,6 +56,11 @@ export interface FetchProfileRules {
   scrollToBottom?: boolean;
 }
 
+export interface MediaProfileRules {
+  includeMetaImages?: boolean;
+  imageMetaProperties?: string[];
+}
+
 export interface SiteProfile {
   name: string;
   match?: MatchProfileRules;
@@ -62,6 +68,7 @@ export interface SiteProfile {
   removals?: RemovalProfileRules;
   metadata?: MetadataProfileRules;
   fetch?: FetchProfileRules;
+  media?: MediaProfileRules;
 }
 
 export interface HtmlCleaningOptions {

@@ -2,6 +2,7 @@ import { localizeImages } from "./assets.js";
 import { cleanHtml } from "./cleaning/clean-html.js";
 import { selectActiveProfiles } from "./cleaning/profiles.js";
 import type { SiteProfile } from "./cleaning/types.js";
+import { proxyAwareFetch } from "./fetch/proxy-fetch.js";
 import { fetchHtml, type FetchHtmlOptions } from "./fetch/strategy.js";
 import type { UrlItem } from "./models.js";
 import { cleanupExistingNote, sanitizeFilename, writeMarkdownNote } from "./output.js";
@@ -84,6 +85,7 @@ function mergeProfileFetchOptions(options: ProcessItemOptions, profiles: SitePro
     if (profile.fetch?.waitSelectorState) merged.waitSelectorState = profile.fetch.waitSelectorState;
     if (profile.fetch?.clickSelectors) merged.clickSelectors = profile.fetch.clickSelectors;
     if (profile.fetch?.scrollToBottom !== undefined) merged.scrollToBottom = profile.fetch.scrollToBottom;
+    if (profile.fetch?.useProxyEnv !== undefined) merged.useProxyEnv = profile.fetch.useProxyEnv;
     if (profile.fetch?.preferBrowserState && options.browserStateDefaults) {
       merged.browserState = {
         ...options.browserStateDefaults,
@@ -108,7 +110,11 @@ export async function processItem(item: UrlItem, options: ProcessItemOptions): P
   const fetchOptions = mergeProfileFetchOptions(options, urlProfiles);
   const html = await fetchHtml(item.url, fetchOptions);
   const activeProfiles = selectActiveProfiles(options.profiles, item.url, html);
-  const cleaned = await cleanHtml(html, { baseUrl: item.url, profiles: options.profiles, activeProfiles });
+  const defuddleFetch = activeProfiles.some((profile) => profile.fetch?.useProxyEnv) ? proxyAwareFetch : undefined;
+  const cleaned = await cleanHtml(html, { baseUrl: item.url, profiles: options.profiles, activeProfiles, defuddleFetch });
+  if (activeProfiles.some((profile) => profile.extraction?.requireText) && !cleaned.content.replace(/<[^>]*>/g, "").trim()) {
+    throw new Error("matched site rule requires extracted text, but no text content was extracted");
+  }
   const title = cleaned.metadata.title || item.sourceTitle || titleFromUrl(item.url);
   await cleanupExistingNote(options.outputDir, item.url);
   const contentHtml = options.localizeAssets === false

@@ -2,9 +2,9 @@
 
 Site rules are feedloom-specific TOML hints for extraction, cleanup, metadata normalization, and fetch behavior.
 
-Do not add TOML rules for sites already handled well by Defuddle's built-in extractors. Prefer Defuddle for procedural extractors such as Medium, Substack, GitHub, Hacker News, Reddit, YouTube, X/Twitter, Wikipedia, NYTimes, ChatGPT, Claude, Gemini, and similar conversation/social/video sites.
+Do not add TOML rules for sites already handled well by Defuddle's built-in extractors. Prefer Defuddle for procedural extractors such as Medium, Substack, GitHub, Hacker News, Reddit, X/Twitter, Wikipedia, NYTimes, ChatGPT, Claude, Gemini, and similar conversation/social/video sites.
 
-Add TOML only when feedloom needs an extra article-specific selector, cleanup overlay, metadata normalization, or conservative site-specific fetch preference.
+Add TOML only when feedloom needs an extra article-specific selector, cleanup overlay, metadata normalization, conservative site-specific fetch preference, or extraction validation. YouTube is a built-in exception: Feedloom uses a TOML rule to opt into proxy-aware fetch and require non-empty transcript text while still relying on Defuddle's YouTube extractor.
 
 ## Locations
 
@@ -62,9 +62,11 @@ wait_selector = "article"
 wait_selector_state = "attached"
 click_selectors = []
 scroll_to_bottom = true
+use_proxy_env = true
 
 [extract]
 selectors = ["article", "main"]
+require_text = true
 
 [metadata]
 fixed_author = "Example"
@@ -123,6 +125,7 @@ Supported fields:
 - `wait_selector_state`: `attached`, `detached`, `visible`, or `hidden`.
 - `click_selectors`: selectors to click after load.
 - `scroll_to_bottom`: scroll before reading HTML.
+- `use_proxy_env`: use `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, and `NO_PROXY` for Feedloom static fetches and Defuddle async extractor fetches. Use this for sites such as YouTube where transcript/API requests must follow the user's proxy settings.
 
 Example for Zhihu-like pages:
 
@@ -155,6 +158,8 @@ selectors = ["#js_content"]
 ```
 
 Prefer content containers over page shells. Avoid broad selectors like `body` unless the site HTML is already minimal.
+
+`require_text = true` makes Feedloom fail the item when the matched rule produces no text after extraction. Use it for extractor-backed pages where an empty note is worse than a visible failure, for example YouTube transcript capture.
 
 ## `[metadata]`
 

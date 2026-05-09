@@ -10,6 +10,7 @@ const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const builtinRulePaths = [
   join(repoRoot, "src", "site-rules", "wechat.toml"),
   join(repoRoot, "src", "site-rules", "xiaohongshu.toml"),
+  join(repoRoot, "src", "site-rules", "youtube.toml"),
   join(repoRoot, "src", "site-rules", "zhihu.toml"),
 ];
 
@@ -21,12 +22,19 @@ describe("built-in TOML site rules", () => {
   it("loads common site profiles from bundled TOML files", async () => {
     const profiles = await loadSiteProfiles(builtinRulePaths);
 
-    expect(profiles.map((profile) => profile.name)).toEqual(["wechat", "xiaohongshu", "zhihu"]);
+    expect(profiles.map((profile) => profile.name)).toEqual(["wechat", "xiaohongshu", "youtube", "zhihu"]);
     expect(profiles.find((profile) => profile.name === "wechat")?.content?.selectors).toContain("#js_content");
     expect(profiles.find((profile) => profile.name === "zhihu")?.metadata?.titleSuffixPatterns).toContain("\\s*-\\s*知乎\\s*$");
     expect(profiles.find((profile) => profile.name === "xiaohongshu")?.media).toMatchObject({
       includeMetaImages: true,
       imageMetaProperties: ["og:image"],
+    });
+    expect(profiles.find((profile) => profile.name === "youtube")?.fetch).toMatchObject({
+      mode: "auto",
+      useProxyEnv: true,
+    });
+    expect(profiles.find((profile) => profile.name === "youtube")?.extraction).toMatchObject({
+      requireText: true,
     });
     expect(profiles.find((profile) => profile.name === "zhihu")?.fetch).toMatchObject({
       mode: "browser",

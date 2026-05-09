@@ -189,6 +189,8 @@ export class HtmlCleaner {
       removePartialSelectors: this.options.removePartialSelectors,
       removeContentPatterns: this.options.removeContentPatterns,
       standardize: this.options.standardize,
+      fetch: this.options.defuddleFetch,
+      language: this.options.language,
     });
     const result = parser.parseAsync ? await parser.parseAsync() : parser.parse();
 

@@ -24,7 +24,7 @@
   ],
   "scripts": {
     "dev": "tsx src/cli.ts",
-    "build": "tsup src/cli.ts --format esm --dts --clean && cp -R src/site-rules dist/site-rules",
+    "build": "tsup src/cli.ts --format esm --dts --clean && rm -rf dist/site-rules && cp -R src/site-rules dist/site-rules",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "prepublishOnly": "npm run typecheck && npm test && npm run build"

@@ -54,11 +54,16 @@ export interface FetchProfileRules {
   waitSelectorState?: "attached" | "detached" | "visible" | "hidden";
   clickSelectors?: string[];
   scrollToBottom?: boolean;
+  useProxyEnv?: boolean;
 }
 
 export interface MediaProfileRules {
   includeMetaImages?: boolean;
   imageMetaProperties?: string[];
+}
+
+export interface ExtractionProfileRules {
+  requireText?: boolean;
 }
 
 export interface SiteProfile {
@@ -69,6 +74,7 @@ export interface SiteProfile {
   metadata?: MetadataProfileRules;
   fetch?: FetchProfileRules;
   media?: MediaProfileRules;
+  extraction?: ExtractionProfileRules;
 }
 
 export interface HtmlCleaningOptions {
@@ -85,6 +91,8 @@ export interface HtmlCleaningOptions {
   contentSelector?: string;
   profiles?: SiteProfile[];
   activeProfiles?: SiteProfile[];
+  defuddleFetch?: typeof fetch;
+  language?: string;
 }
 
 export interface RemovalRecord {

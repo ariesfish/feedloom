@@ -56,15 +56,17 @@ selectors = ["[class*=\"Post-RichTextContainer\"]", "[class*=\"RichText ztext\"]
 Supported sections:
 
 - `[match]`: `host_suffixes`, `host_regexes`, `url_regexes`, `html_markers`.
-- `[fetch]`: `mode`, `prefer_browser_state`, `wait_ms`, `network_idle`, `wait_selector`, `wait_selector_state`, `click_selectors`, `scroll_to_bottom`.
-- `[extract]`: `selectors`.
+- `[fetch]`: `mode`, `prefer_browser_state`, `wait_ms`, `network_idle`, `wait_selector`, `wait_selector_state`, `click_selectors`, `scroll_to_bottom`, `use_proxy_env`.
+- `[extract]`: `selectors`, `require_text`.
 - `[metadata]`: `fixed_author`, `strip_title_regexes`, `strip_author_regexes`, `author_selectors`, `author_meta_names`, `author_meta_itemprops`, `author_meta_properties`.
 - `[clean.remove]`: `selectors`, `class_contains`, `id_contains`, `attr_contains`, `text_contains`, `text_regexes`, `exact_text`.
 - `[clean.truncate]`: `after_contains`, `after_regexes`.
 
 ## Fetch rules
 
-Use `[fetch]` only when a site consistently needs browser rendering, local Chrome state, scrolling, waiting, or clicking.
+Use `[fetch]` only when a site consistently needs browser rendering, local Chrome state, scrolling, waiting, clicking, or proxy-aware requests.
+
+`use_proxy_env = true` tells Feedloom to use `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, and `NO_PROXY` for static fetches and Defuddle async extractor fetches. Use this for YouTube transcript capture and similar extractor-backed pages that need the user's proxy settings.
 
 `prefer_browser_state = true` only tells Feedloom to use copied Chrome state for matching URLs. It does not store the local Chrome path. The command still needs Chrome state parameters when login state is required:
 
@@ -80,6 +82,7 @@ npx -y @ariesfish/feedloom \
 
 - Prefer narrow domain-specific selectors over broad selectors.
 - Prefer content containers over page shells. Avoid `body` unless the HTML is already minimal.
+- Use `require_text = true` when a matched extractor-backed page should fail instead of writing an empty note.
 - Use cleanup only for repeated, stable noise inside otherwise correct content.
 - Use truncation only for stable tail markers where everything after the marker is non-article content.
 - Do not add aggressive crawling, high concurrency, repeated challenge solving, or broad stealth defaults.

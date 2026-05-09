@@ -4,11 +4,11 @@ export interface StaticFetchResult {
   contentType: string;
 }
 
-export async function fetchStaticHtml(url: string, timeoutMs = 60_000): Promise<StaticFetchResult> {
+export async function fetchStaticHtml(url: string, timeoutMs = 60_000, fetchImpl: typeof fetch = fetch): Promise<StaticFetchResult> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const response = await fetch(url, {
+    const response = await fetchImpl(url, {
       redirect: "follow",
       signal: controller.signal,
       headers: {

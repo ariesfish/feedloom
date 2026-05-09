@@ -1,0 +1,10 @@
+[match]
+host_suffixes = ["youtube.com", "youtu.be"]
+url_regexes = ["https?://(www\\.)?youtube\\.com/watch\\?", "https?://youtu\\.be/"]
+
+[fetch]
+mode = "auto"
+use_proxy_env = true
+
+[extract]
+require_text = true

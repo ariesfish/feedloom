@@ -97,6 +97,59 @@ describe("processItem", () => {
     }
   });
 
+  it("passes proxy-aware fetch to Defuddle for matching site profiles", async () => {
+    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-defuddle-fetch-"));
+    try {
+      const result = await processItem(
+        { url: "https://youtube.com/watch?v=demo", sourceKind: "html-page" },
+        {
+          outputDir,
+          profiles: [
+            {
+              name: "youtube",
+              match: { hostSuffixes: ["youtube.com"] },
+              fetch: { useProxyEnv: true },
+            },
+          ],
+          staticFetch: async () => `<!doctype html><html><head><title>Video Demo</title></head><body><script>ytInitialPlayerResponse = {"videoDetails":{"videoId":"demo"}}</script><main>${longParagraph()}</main></body></html>`,
+          browserFetch: async () => {
+            throw new Error("browser should not be used");
+          },
+        },
+      );
+
+      expect(result.title).toBe("Video Demo");
+    } finally {
+      await rm(outputDir, { recursive: true, force: true });
+    }
+  });
+
+  it("fails when a matching site profile requires extracted text but extraction is empty", async () => {
+    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-require-text-"));
+    try {
+      await expect(processItem(
+        { url: "https://empty.example/video", sourceKind: "html-page" },
+        {
+          outputDir,
+          profiles: [
+            {
+              name: "empty-demo",
+              match: { hostSuffixes: ["empty.example"] },
+              extraction: { requireText: true },
+            },
+          ],
+          staticFetch: async () => "",
+          browserFetch: async () => {
+            throw new Error("browser should not be used");
+          },
+          isMeaningful: () => true,
+        },
+      )).rejects.toThrow("matched site rule requires extracted text, but no text content was extracted");
+    } finally {
+      await rm(outputDir, { recursive: true, force: true });
+    }
+  });
+
   it("removes an existing note and matching asset directory before regenerating the same source URL", async () => {
     const outputDir = await mkdtemp(join(tmpdir(), "feedloom-rerun-"));
     try {

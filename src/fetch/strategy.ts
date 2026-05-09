@@ -3,6 +3,7 @@ import { writeFile } from "node:fs/promises";
 import { htmlHasMeaningfulContent } from "../extract/meaningful.js";
 import { fetchBrowserHtml } from "./browser.js";
 import { type BrowserStateConfig, fetchBrowserHtmlWithBrowserState } from "./browser-state.js";
+import { proxyAwareFetch } from "./proxy-fetch.js";
 import { fetchStaticHtml } from "./static.js";
 import { fetchStealthHtml } from "./stealth.js";
 
@@ -29,6 +30,7 @@ export interface FetchHtmlOptions {
   scrollToBottom?: boolean;
   headless?: boolean;
   realChromeDefaults?: boolean;
+  useProxyEnv?: boolean;
 }
 
 export interface FetchResult {
@@ -52,7 +54,7 @@ async function writeOutputIfRequested(outputPath: string | undefined, html: stri
 
 export async function fetchHtmlResult(url: string, options: FetchHtmlOptions = {}): Promise<FetchResult> {
   const isMeaningful = options.isMeaningful ?? htmlHasMeaningfulContent;
-  const staticFetch = options.staticFetch ?? (async (targetUrl: string) => (await fetchStaticHtml(targetUrl)).html);
+  const staticFetch = options.staticFetch ?? (async (targetUrl: string) => (await fetchStaticHtml(targetUrl, undefined, options.useProxyEnv ? proxyAwareFetch : undefined)).html);
   const browserFetch = options.browserFetch ?? ((targetUrl: string) => fetchBrowserHtml(targetUrl, {
     waitMs: options.waitMs,
     networkIdle: options.networkIdle,

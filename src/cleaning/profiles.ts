@@ -13,6 +13,7 @@ interface FeedloomTomlRule {
   };
   extract?: {
     selectors?: string[];
+    require_text?: boolean;
   };
   metadata?: {
     fixed_author?: string;
@@ -32,6 +33,7 @@ interface FeedloomTomlRule {
     wait_selector_state?: "attached" | "detached" | "visible" | "hidden";
     click_selectors?: string[];
     scroll_to_bottom?: boolean;
+    use_proxy_env?: boolean;
   };
   media?: {
     include_meta_images?: boolean;
@@ -101,10 +103,14 @@ export function profileFromTomlRule(name: string, rule: FeedloomTomlRule): SiteP
       waitSelectorState: rule.fetch?.wait_selector_state,
       clickSelectors: rule.fetch?.click_selectors,
       scrollToBottom: rule.fetch?.scroll_to_bottom,
+      useProxyEnv: rule.fetch?.use_proxy_env,
     },
     media: {
       includeMetaImages: rule.media?.include_meta_images,
       imageMetaProperties: rule.media?.image_meta_properties,
+    },
+    extraction: {
+      requireText: rule.extract?.require_text,
     },
   };
 }

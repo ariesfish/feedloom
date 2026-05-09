@@ -4,9 +4,9 @@
   <img src="assets/logo.png" alt="Feedloom logo" width="160">
   <p><strong>Archive long-form web content as clean Markdown with local assets.</strong></p>
   <p>
-    <a href="https://www.npmjs.com/package/@ariesfish/feedloom"><img alt="npm" src="https://img.shields.io/npm/v/@ariesfish/feedloom"></a>
-    <img alt="Node.js >= 24" src="https://img.shields.io/badge/node-%3E%3D24-339933">
-    <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-blue">
+    <a href="https://www.npmjs.com/package/@ariesfish/feedloom"><img alt="npm version" src="https://img.shields.io/npm/v/@ariesfish/feedloom"></a>
+    <img alt="Node 24 or newer" src="https://img.shields.io/badge/node-24%2B-339933">
+    <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-blue">
   </p>
 </div>
 

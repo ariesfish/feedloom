@@ -1,6 +1,6 @@
 {
   "name": "@ariesfish/feedloom",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "type": "module",
   "author": "ariesfish",
   "license": "MIT",
@@ -17,6 +17,7 @@
     "feedloom": "dist/cli.js"
   },
   "files": [
+    "assets",
     "dist",
     "skills",
     "README.md",

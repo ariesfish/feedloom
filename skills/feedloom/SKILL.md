@@ -22,6 +22,12 @@ npx -y @ariesfish/feedloom <inputs...> [options]
 
 ## Common usage
 
+Before clipping with browser-based fetch modes, run `doctor` once to verify and repair the Patchright Chromium runtime. If Chromium is missing, `doctor` automatically runs `npx patchright install chromium`.
+
+```bash
+npx -y @ariesfish/feedloom doctor
+```
+
 Before running Feedloom, check whether this skill directory has a `site-rules/` directory. If it exists, always pass it with `--site-rules-dir $HOME/.agents/skills/feedloom/site-rules`; do not omit available site rules.
 
 ```bash
@@ -61,7 +67,7 @@ Use the least expensive mode that works:
 - `--site-rules-dir <dir>`: load optional private TOML extraction/cleaning rules from a local directory, for example `$HOME/.agents/skills/feedloom/site-rules/` reference folder.
 - `--solve-cloudflare`, `--proxy <server>`, `--dns-over-https`: use only when stealth fetching needs them.
 
-Run `npx -y @ariesfish/feedloom --help` for the complete option list. Do not invent unsupported options.
+Run `npx -y @ariesfish/feedloom doctor` when browser, stealth, or auto fallback fails because Chromium is missing or cannot launch. Run `npx -y @ariesfish/feedloom --help` for the complete option list. Do not invent unsupported options.
 
 ## Site rules
 

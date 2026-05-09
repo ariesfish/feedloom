@@ -1,5 +1,15 @@
 # Feedloom
 
+<div align="center">
+  <img src="assets/logo.png" alt="Feedloom logo" width="160">
+  <p><strong>Archive long-form web content as clean Markdown with local assets.</strong></p>
+  <p>
+    <a href="https://www.npmjs.com/package/@ariesfish/feedloom"><img alt="npm" src="https://img.shields.io/npm/v/@ariesfish/feedloom"></a>
+    <img alt="Node.js >= 24" src="https://img.shields.io/badge/node-%3E%3D24-339933">
+    <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-blue">
+  </p>
+</div>
+
 Feedloom is a command-line tool for archiving long-form web content. It takes article URLs, URL list files, or RSS/Atom feeds, extracts readable article content, converts it to Markdown with YAML frontmatter, and saves page images as local assets. It is designed for personal knowledge bases, notebook vaults, and offline reading archives.
 
 ## Features
@@ -42,6 +52,14 @@ If you plan to use `browser`, `stealth`, or the browser fallback in `auto` mode,
 ```bash
 npx patchright install chromium
 ```
+
+You can verify or repair the runtime later with:
+
+```bash
+npm run dev -- doctor
+```
+
+If the Patchright Chromium executable is missing, `doctor` runs `npx patchright install chromium` automatically.
 
 ### 4. Build the CLI
 
@@ -259,6 +277,12 @@ Only use this on your own device and accounts. Always respect the target site's 
 --chrome-user-data-dir <path>   Chrome User Data directory
 --chrome-profile <name>         Chrome profile name. Default: Default
 --site-rules-dir <dir>          Optional directory of private TOML site rules
+```
+
+Run environment checks:
+
+```bash
+npm run dev -- doctor
 ```
 
 For the full option list, run:

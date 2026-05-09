@@ -1,17 +1,22 @@
 #!/usr/bin/env node
 
 import { readdir } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { Command } from "commander";
 
 import { loadSiteProfiles } from "./cleaning/profiles.js";
+import { formatDoctorResult, runDoctor } from "./doctor.js";
 import { BatchFetchSessions } from "./fetch/batch.js";
 import { parseInputs, sliceItems } from "./input/inputs.js";
 import { expandSourceItems, parseSinceDate, type SourceKind } from "./input/sources.js";
 import { processItem } from "./pipeline.js";
 import { ProgressTracker } from "./tracking.js";
+
+const require = createRequire(import.meta.url);
+const packageJson = require("../package.json") as { version?: string };
 
 const program = new Command();
 
@@ -35,7 +40,18 @@ function positiveIntOption(value: unknown, fallback: number): number {
 program
   .name("feedloom")
   .description("Archive long-form web content as clean Markdown with local assets")
-  .version("0.1.0")
+  .version(packageJson.version ?? "0.0.0");
+
+program
+  .command("doctor")
+  .description("Check Feedloom runtime dependencies")
+  .action(async () => {
+    const result = await runDoctor();
+    console.error(formatDoctorResult(result));
+    process.exitCode = result.ok ? 0 : 1;
+  });
+
+program
   .option("--output-dir <dir>", "Output directory for markdown notes", "clippings")
   .option("--source-kind <kind>", "auto, html-page, or rss-feed", "auto")
   .option("--since <date>", "Only keep feed entries on or after YYYY-MM-DD", "")
@@ -126,32 +142,32 @@ program
       });
 
       try {
-      for (const item of selected) {
-        tracker.start(item.url);
-        try {
-          const result = await processItem(item, {
-            outputDir,
-            profiles,
-            browserState: options.preferBrowserState ? { ...browserStateDefaults, ...browserOptions } : null,
-            browserStateDefaults,
-            fetchMode,
-            ...browserOptions,
-            solveCloudflare: Boolean(options.solveCloudflare),
-            disableResources: Boolean(options.disableResources),
-            browserFetch: sessions ? (targetUrl: string) => sessions.browserFetch(targetUrl) : undefined,
-            stealthFetch: sessions ? (targetUrl: string) => sessions.stealthFetch(targetUrl) : undefined,
-          });
-          console.error(`Wrote ${result.outputPath}`);
-          tracker.done(item.url, result.outputPath);
-          const checkbox = item.sourcePath ? checkboxFiles.get(item.sourcePath) : undefined;
-          checkbox?.markDone(item.lineNo, item.url);
-        } catch (error) {
-          failures += 1;
-          const message = (error as Error).message || String(error);
-          tracker.fail(item.url, message);
-          console.error(`Failed ${item.url}: ${message}`);
+        for (const item of selected) {
+          tracker.start(item.url);
+          try {
+            const result = await processItem(item, {
+              outputDir,
+              profiles,
+              browserState: options.preferBrowserState ? { ...browserStateDefaults, ...browserOptions } : null,
+              browserStateDefaults,
+              fetchMode,
+              ...browserOptions,
+              solveCloudflare: Boolean(options.solveCloudflare),
+              disableResources: Boolean(options.disableResources),
+              browserFetch: sessions ? (targetUrl: string) => sessions.browserFetch(targetUrl) : undefined,
+              stealthFetch: sessions ? (targetUrl: string) => sessions.stealthFetch(targetUrl) : undefined,
+            });
+            console.error(`Wrote ${result.outputPath}`);
+            tracker.done(item.url, result.outputPath);
+            const checkbox = item.sourcePath ? checkboxFiles.get(item.sourcePath) : undefined;
+            checkbox?.markDone(item.lineNo, item.url);
+          } catch (error) {
+            failures += 1;
+            const message = (error as Error).message || String(error);
+            tracker.fail(item.url, message);
+            console.error(`Failed ${item.url}: ${message}`);
+          }
         }
-      }
       } finally {
         await sessions?.close();
       }

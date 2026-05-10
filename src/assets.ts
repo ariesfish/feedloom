@@ -47,15 +47,24 @@ export async function localizeImages(html: string, options: LocalizeImagesOption
     }
     let rel = seen.get(absolute);
     if (!rel) {
-      const response = await fetchImage(absolute);
+      let response: Response;
+      try {
+        response = await fetchImage(absolute);
+      } catch {
+        continue;
+      }
       if (!response.ok) continue;
       const contentType = response.headers.get("content-type");
       if (contentType && !contentType.toLowerCase().startsWith("image/")) continue;
       const ext = extensionFrom(contentType, absolute);
       const filename = `image-${String(index).padStart(3, "0")}${ext}`;
       index += 1;
-      await mkdir(assetDir, { recursive: true });
-      await writeFile(join(assetDir, filename), new Uint8Array(await response.arrayBuffer()));
+      try {
+        await mkdir(assetDir, { recursive: true });
+        await writeFile(join(assetDir, filename), new Uint8Array(await response.arrayBuffer()));
+      } catch {
+        continue;
+      }
       rel = `assets/${encodeURIComponent(options.noteSlug)}/${filename}`;
       seen.set(absolute, rel);
     }

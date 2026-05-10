@@ -2,9 +2,9 @@
 
 Site rules are feedloom-specific TOML hints for extraction, cleanup, metadata normalization, and fetch behavior.
 
-Do not add TOML rules for sites already handled well by Defuddle's built-in extractors. Prefer Defuddle for procedural extractors such as Medium, Substack, GitHub, Hacker News, Reddit, X/Twitter, Wikipedia, NYTimes, ChatGPT, Claude, Gemini, and similar conversation/social/video sites.
+Do not add TOML rules for sites already handled well by Defuddle's built-in extractors. Prefer Defuddle for procedural extractors such as Medium, Substack, GitHub, Hacker News, Reddit, Wikipedia, NYTimes, ChatGPT, Claude, Gemini, and similar conversation/social/video sites.
 
-Add TOML only when feedloom needs an extra article-specific selector, cleanup overlay, metadata normalization, conservative site-specific fetch preference, or extraction validation. YouTube is a built-in exception: Feedloom uses a TOML rule to opt into proxy-aware fetch and require non-empty transcript text while still relying on Defuddle's YouTube extractor.
+Add TOML only when feedloom needs an extra article-specific selector, cleanup overlay, metadata normalization, conservative site-specific fetch preference, or extraction validation. YouTube and X/Twitter are built-in exceptions: Feedloom uses TOML rules to opt into proxy-aware/browser fetch preferences and require non-empty extracted text while still relying on Defuddle's procedural extractors.
 
 ## Locations
 

@@ -52,4 +52,22 @@ describe("localizeImages", () => {
       await rm(outputDir, { recursive: true, force: true });
     }
   });
+
+  it("keeps the original remote image when download fails", async () => {
+    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-assets-"));
+    try {
+      const html = await localizeImages('<p><img src="https://cdn.example.com/unreachable.jpg"></p>', {
+        outputDir,
+        noteSlug: "Remote",
+        baseUrl: "https://example.com/post",
+        fetchImage: async () => {
+          throw new TypeError("fetch failed");
+        },
+      });
+
+      expect(html).toContain('src="https://cdn.example.com/unreachable.jpg"');
+    } finally {
+      await rm(outputDir, { recursive: true, force: true });
+    }
+  });
 });

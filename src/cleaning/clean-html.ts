@@ -49,6 +49,20 @@ type DefuddleConstructor = new (document: Document, options?: Record<string, unk
 const DefuddleClass = ((DefuddleModule as unknown as { default?: DefuddleConstructor; Defuddle?: DefuddleConstructor }).default ??
   (DefuddleModule as unknown as { Defuddle?: DefuddleConstructor }).Defuddle) as DefuddleConstructor;
 
+type DomConstructorName = "Node" | "Element" | "HTMLElement" | "Document" | "DocumentFragment" | "Text" | "Comment" | "HTMLAnchorElement";
+
+type DomConstructorMap = Partial<Record<DomConstructorName, unknown>>;
+
+function installDefuddleDomGlobals(window: Window & typeof globalThis): void {
+  const target = globalThis as DomConstructorMap;
+  const source = window as unknown as DomConstructorMap;
+  for (const key of ["Node", "Element", "HTMLElement", "Document", "DocumentFragment", "Text", "Comment", "HTMLAnchorElement"] as const) {
+    if (!target[key] && source[key]) {
+      target[key] = source[key];
+    }
+  }
+}
+
 function firstMetaContent(document: Document, names: string[]): string | undefined {
   for (const name of names) {
     const escaped = name.replace(/"/g, "\\\"");
@@ -168,7 +182,9 @@ export class HtmlCleaner {
 
     const html = /<html[\s>]/i.test(rawHtml) ? rawHtml : `<!doctype html><html><body>${rawHtml}</body></html>`;
 
-    const { document } = parseHTML(html);
+    const window = parseHTML(html);
+    installDefuddleDomGlobals(window);
+    const { document } = window;
     const contentSelector = preferredContentSelector && document.querySelector(preferredContentSelector) ? preferredContentSelector : undefined;
     const doc = document as Document & { URL?: string };
     if (this.options.baseUrl) {

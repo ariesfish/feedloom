@@ -161,6 +161,30 @@ describe("Defuddle-backed cleanHtml", () => {
     expect(result.content).toContain('src="https://cdn.example.com/b.jpg"');
   });
 
+  it("installs linkedom DOM globals required by procedural Defuddle extractors", async () => {
+    const originalNode = globalThis.Node;
+    try {
+      Reflect.deleteProperty(globalThis, "Node");
+      const result = await cleanHtml(
+        `<!doctype html><html><head><title>Post / X</title></head><body>
+          <div data-testid="cellInnerDiv">
+            <article data-testid="tweet">
+              <div data-testid="User-Name"><span>@alice</span></div>
+              <div data-testid="tweetText">${"Long post text ".repeat(80)}</div>
+            </article>
+          </div>
+        </body></html>`,
+        { baseUrl: "https://x.com/alice/status/1" },
+      );
+
+      expect(globalThis.Node).toBeTruthy();
+      expect(result.content).toContain("Long post text");
+      expect(result.metadata.title).toContain("Post");
+    } finally {
+      globalThis.Node = originalNode;
+    }
+  });
+
   it("loads standard site profiles from user-provided TOML files", async () => {
     const dir = await mkdtemp(join(tmpdir(), "feedloom-profiles-"));
     const path = join(dir, "demo.toml");

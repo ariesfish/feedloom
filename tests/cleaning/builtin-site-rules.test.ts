@@ -9,6 +9,7 @@ import { loadSiteProfiles } from "../../src/cleaning/profiles.js";
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const builtinRulePaths = [
   join(repoRoot, "src", "site-rules", "wechat.toml"),
+  join(repoRoot, "src", "site-rules", "x.toml"),
   join(repoRoot, "src", "site-rules", "xiaohongshu.toml"),
   join(repoRoot, "src", "site-rules", "youtube.toml"),
   join(repoRoot, "src", "site-rules", "zhihu.toml"),
@@ -22,7 +23,7 @@ describe("built-in TOML site rules", () => {
   it("loads common site profiles from bundled TOML files", async () => {
     const profiles = await loadSiteProfiles(builtinRulePaths);
 
-    expect(profiles.map((profile) => profile.name)).toEqual(["wechat", "xiaohongshu", "youtube", "zhihu"]);
+    expect(profiles.map((profile) => profile.name)).toEqual(["wechat", "x", "xiaohongshu", "youtube", "zhihu"]);
     expect(profiles.find((profile) => profile.name === "wechat")?.content?.selectors).toContain("#js_content");
     expect(profiles.find((profile) => profile.name === "zhihu")?.metadata?.titleSuffixPatterns).toContain("\\s*-\\s*知乎\\s*$");
     expect(profiles.find((profile) => profile.name === "xiaohongshu")?.media).toMatchObject({
@@ -33,7 +34,16 @@ describe("built-in TOML site rules", () => {
       mode: "auto",
       useProxyEnv: true,
     });
+    expect(profiles.find((profile) => profile.name === "x")?.fetch).toMatchObject({
+      mode: "browser",
+      scrollToBottom: true,
+      waitMs: 8000,
+      useProxyEnv: true,
+    });
     expect(profiles.find((profile) => profile.name === "youtube")?.extraction).toMatchObject({
+      requireText: true,
+    });
+    expect(profiles.find((profile) => profile.name === "x")?.extraction).toMatchObject({
       requireText: true,
     });
     expect(profiles.find((profile) => profile.name === "zhihu")?.fetch).toMatchObject({

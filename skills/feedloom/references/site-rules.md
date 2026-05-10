@@ -66,7 +66,7 @@ Supported sections:
 
 Use `[fetch]` only when a site consistently needs browser rendering, local Chrome state, scrolling, waiting, clicking, or proxy-aware requests.
 
-`use_proxy_env = true` tells Feedloom to use `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, and `NO_PROXY` for static fetches and Defuddle async extractor fetches. Use this for YouTube transcript capture and similar extractor-backed pages that need the user's proxy settings.
+`use_proxy_env = true` tells Feedloom to use `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, and `NO_PROXY` for static fetches and Defuddle async extractor fetches. Use this for YouTube transcript capture, X/Twitter posts, and similar extractor-backed pages that need the user's proxy settings.
 
 `prefer_browser_state = true` only tells Feedloom to use copied Chrome state for matching URLs. It does not store the local Chrome path. The command still needs Chrome state parameters when login state is required:
 

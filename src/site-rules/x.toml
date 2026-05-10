@@ -1,0 +1,15 @@
+[match]
+host_suffixes = ["x.com", "twitter.com"]
+url_regexes = ["https?://(www\\.)?(x|twitter)\\.com/[^/]+/status/"]
+
+[fetch]
+mode = "browser"
+scroll_to_bottom = true
+wait_ms = 8000
+use_proxy_env = true
+
+[extract]
+require_text = true
+
+[metadata]
+strip_title_regexes = ["\\s*/\\s*X\\s*$", "\\s*on X:\\s*.*$"]

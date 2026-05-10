@@ -1,128 +1,117 @@
-# Feedloom
-
 <div align="center">
   <img src="assets/logo.png" alt="Feedloom logo" width="160">
-  <p><strong>Archive long-form web content as clean Markdown with local assets.</strong></p>
+  <h1>Feedloom</h1>
+  <p><strong>快速剪藏优质内容</strong></p>
+  <p><strong>支持公众号、小红书、知乎、X、YouTube 等各种网站</strong></p>
   <p>
     <a href="https://www.npmjs.com/package/@ariesfish/feedloom"><img alt="npm version" src="https://img.shields.io/npm/v/@ariesfish/feedloom"></a>
     <img alt="Node 24 or newer" src="https://img.shields.io/badge/node-24%2B-339933">
     <img alt="MIT license" src="https://img.shields.io/badge/license-MIT-blue">
   </p>
+  <p><a href="README.en.md">English</a></p>
 </div>
 
-Feedloom is a command-line tool for archiving long-form web content. It takes article URLs, URL list files, or RSS/Atom feeds, extracts readable article content, converts it to Markdown with YAML frontmatter, and saves page images as local assets. It is designed for personal knowledge bases, notebook vaults, and offline reading archives.
+Feedloom 是一个 Agent 原生的网页剪藏工具。给它一篇文章、一组链接或一个 RSS 订阅，它会为你提取正文、清理页面噪音、下载图片，并生成适合放进个人知识库、Obsidian、离线阅读目录的完整 Markdown 文档。
 
-## Features
+它适合这些场景：
 
-- Accept one or more URLs directly from the command line.
-- Extract URLs from text or Markdown files, with automatic deduplication.
-- Expand RSS/Atom feeds and optionally filter entries by date.
-- Clean article HTML and convert it to Markdown.
-- Download and localize article images.
-- Generate Markdown notes with `source`, `author`, and `created` frontmatter.
-- Support static fetch, browser-rendered fetch, and stealth fetch modes.
-- Optionally use a local Chrome profile for pages that require login state.
-- Automatically mark Markdown checklist items as done after successful processing.
+- 看到一篇值得收藏的文章，不想只保留一个以后可能失效的链接。
+- 把博客、公众号、知乎、小红书、X、YouTube 等各种网页内容收藏到自己的知识库。
+- 支持批量剪藏，免去一篇篇复制粘贴。
+- 保存文章时同时保留本地图片，方便离线阅读和迁移。
 
-## Requirements
+## 主要能力
+
+- 把文章保存为带 YAML frontmatter 的 Markdown。
+- 自动下载页面图片，并改写为本地 Markdown 图片引用。
+- 支持直接输入 URL、读取批量链接列表和 RSS 订阅。
+- 支持静态抓取、浏览器渲染抓取、stealth 模式，适应需要 JavaScript 渲染的页面。
+- 内置常见站点规则，例如微信公众号、知乎、小红书、X、YouTube 等。
+- 可选使用本机登录状态，处理需要登录或反爬较强的页面。
+
+## 安装要求
 
 - Node.js >= 24
 - npm
-- macOS, Linux, or Windows should work; browser-based fetching depends on Patchright/Chromium.
+- 使用浏览器抓取时需要 Patchright Chromium；`doctor` 命令可以自动检查并安装。
 
-## Installation
+## 直接运行
 
-### 1. Clone the repository
-
-```bash
-git clone <this-repository-url>
-cd feedloom
-```
-
-### 2. Install dependencies
+无需安装，直接用 `npx`：
 
 ```bash
-npm install
+npx -y @ariesfish/feedloom "https://example.com/article"
 ```
 
-### 3. Install the browser runtime
-
-If you plan to use `browser`, `stealth`, or the browser fallback in `auto` mode, install the Patchright Chromium runtime:
+也可以全局安装：
 
 ```bash
-npx patchright install chromium
+npm install -g @ariesfish/feedloom
+feedloom "https://example.com/article"
 ```
 
-You can verify or repair the runtime later with:
+检查并修复浏览器运行环境：
 
 ```bash
-npm run dev -- doctor
+npx -y @ariesfish/feedloom doctor
 ```
 
-If the Patchright Chromium executable is missing, `doctor` runs `npx patchright install chromium` automatically.
+如果缺少 Patchright Chromium，`doctor` 会自动执行 `npx patchright install chromium`。
 
-### 4. Build the CLI
+## 快速开始
+
+保存单篇文章：
 
 ```bash
-npm run build
+npx -y @ariesfish/feedloom "https://example.com/article"
 ```
 
-After building, run:
+指定输出目录：
 
 ```bash
-node dist/cli.js --help
+npx -y @ariesfish/feedloom --output-dir ./outputs "https://example.com/article"
 ```
 
-During development, you can run the TypeScript source directly:
+批量保存 URL 列表：
 
 ```bash
-npm run dev -- --help
+npx -y @ariesfish/feedloom urls.md --limit 10
 ```
 
-To make the CLI available globally on your machine:
+`urls.md` 可以是普通链接列表，也可以是 Markdown checklist：
+
+```markdown
+- [ ] https://example.com/a
+- [ ] https://example.com/b
+```
+
+成功处理后，对应项会被标记为完成：
+
+```markdown
+- [x] https://example.com/a
+```
+
+保存 RSS 订阅中的文章：
 
 ```bash
-npm link
-feedloom --help
+npx -y @ariesfish/feedloom "https://example.com/feed.xml" --source-kind rss-feed --since 2026-01-01
 ```
 
-## Agent Skill
-
-Feedloom ships an Agent Skill in `skills/feedloom`, so agents that support the `skills` CLI can install the clipping workflow directly from the package or repository:
+处理需要 JavaScript 渲染的页面：
 
 ```bash
-npx skills add @ariesfish/feedloom --skill feedloom
+npx -y @ariesfish/feedloom "https://example.com/article" --fetch-mode browser --wait-ms 4000 --scroll-to-bottom
 ```
 
-For a global install across supported agents:
+普通模式失败时，再尝试 `stealth` 模式：
 
 ```bash
-npx skills add @ariesfish/feedloom --skill feedloom --global
+npx -y @ariesfish/feedloom "https://example.com/article" --fetch-mode stealth --solve-cloudflare
 ```
 
-After installing the skill, ask your agent to save article URLs, URL lists, or RSS feeds as Markdown. The skill runs the CLI through `npx -y @ariesfish/feedloom` by default.
+## 输出长什么样
 
-## Quick Start
-
-Archive a single article to the default `clippings/` directory:
-
-```bash
-npm run dev -- "https://example.com/article"
-```
-
-Write output to a custom directory:
-
-```bash
-npm run dev -- --output-dir ./outputs "https://example.com/article"
-```
-
-Use the built CLI:
-
-```bash
-node dist/cli.js --output-dir ./outputs "https://example.com/article"
-```
-
-The generated Markdown will look roughly like this:
+Feedloom 默认写入 `clippings/`。生成的 Markdown 大致如下：
 
 ```markdown
 ---
@@ -136,188 +125,55 @@ created: "2026-04-29"
 Article content...
 ```
 
-Images are downloaded into an `assets/` subdirectory under the output directory and rewritten as local Markdown references.
+## 抓取模式怎么选
 
-## Input Methods
-
-### Pass multiple URLs directly
-
-```bash
-npm run dev -- \
-  "https://example.com/a" \
-  "https://example.com/b"
-```
-
-### Read URLs from a file
-
-`urls.md` can be a plain URL list or a Markdown checklist:
-
-```markdown
-- [ ] https://example.com/a
-- [ ] https://example.com/b
-```
-
-Run:
-
-```bash
-npm run dev -- --output-dir ./outputs urls.md
-```
-
-After a URL is processed successfully, the matching checklist item is updated automatically:
-
-```markdown
-- [x] https://example.com/a
-```
-
-### Process RSS/Atom feeds
-
-By default, `--source-kind auto` tries to detect whether the input is a normal HTML page or a feed. You can also specify the source kind explicitly:
-
-```bash
-npm run dev -- --source-kind rss-feed --since 2026-01-01 "https://example.com/feed.xml"
-```
-
-Useful slicing options:
-
-```bash
-npm run dev -- --start 1 --end 10 "https://example.com/feed.xml"
-npm run dev -- --limit 5 "https://example.com/feed.xml"
-```
-
-## Fetch Modes
-
-Use `--fetch-mode` to control how pages are fetched:
-
-| Mode | Description |
+| 模式 | 适合情况 |
 | --- | --- |
-| `auto` | Default. Try static fetch first, then fall back to browser/stealth when content is insufficient. |
-| `static` | Use plain HTTP fetching only. Fastest option for static pages. |
-| `browser` | Render the page in a browser. Useful for JavaScript-heavy sites. |
-| `stealth` | Use a more realistic browser context. Useful for sites with stronger bot detection. |
+| `auto` | 默认模式。先尝试静态抓取，内容不足时再回退到浏览器/stealth。 |
+| `static` | 页面本身已服务端渲染，不需要 JavaScript。速度最快。 |
+| `browser` | 页面需要 JavaScript 渲染、等待元素、点击按钮或滚动加载。 |
+| `stealth` | 普通浏览器模式仍失败，站点有更强的反爬检测。 |
 
-Examples:
+建议先用默认 `auto`。只有结果不完整时，再显式选择 `browser` 或 `stealth`。
 
-```bash
-npm run dev -- --fetch-mode browser "https://example.com/article"
-npm run dev -- --fetch-mode stealth --solve-cloudflare "https://example.com/article"
-```
+## 自定义规则
 
-## Browser Options
-
-Wait longer after page load:
+Feedloom 内置 TOML 站点规则，用于处理常见的动态页面或结构化站点。你也可以把自己的私有规则放在包外，并在运行时指定：
 
 ```bash
-npm run dev -- --fetch-mode browser --wait-ms 5000 "https://example.com/article"
+npx -y @ariesfish/feedloom "https://example.com/article" --site-rules-dir ./site-rules
 ```
 
-Wait for a selector before extracting content:
+私有规则适合为自己的常用网站做精准适配。
+
+## Agent Skill
+
+Feedloom 随包提供 `skills/feedloom`，支持 `skills` CLI 的 Agent 可以直接安装这个网页归档能力：
 
 ```bash
-npm run dev -- --fetch-mode browser --wait-selector "article" "https://example.com/article"
+npx skills add @ariesfish/feedloom --skill feedloom
 ```
 
-Click popups or expand buttons before extraction:
+全局安装到支持的 Agent：
 
 ```bash
-npm run dev -- --fetch-mode browser --click-selector "button.accept" --click-selector ".expand" "https://example.com/article"
+npx skills add @ariesfish/feedloom --skill feedloom --global
 ```
 
-Scroll to the bottom before extraction:
+## 使用建议
 
-```bash
-npm run dev -- --fetch-mode browser --scroll-to-bottom "https://example.com/article"
-```
+- 大批量归档前，先用 `--limit` 跑几篇确认效果。
+- 静态博客和新闻站通常用默认模式即可；动态站点再尝试 `--fetch-mode browser`。
+- 不要把 Feedloom 当成高并发爬虫。它更适合个人剪藏使用。
+- 遵守 robots.txt、网站服务条款、版权规则和访问频率限制。
 
-Use a proxy:
+## 致谢
 
-```bash
-npm run dev -- --fetch-mode stealth --proxy "http://127.0.0.1:7890" "https://example.com/article"
-```
+Feedloom 受到这些优秀项目启发：
 
-Run with a visible browser window for debugging:
-
-```bash
-npm run dev -- --fetch-mode browser --headful "https://example.com/article"
-```
-
-## Use Local Chrome Login State
-
-For pages that require an authenticated browser session, you can try using your local Chrome profile:
-
-```bash
-npm run dev -- \
-  --prefer-browser-state \
-  --chrome-user-data-dir "{CHROME_INSTALL_PATH}" \
-  --chrome-profile "Default" \
-  --fetch-mode browser \
-  "https://example.com/member-only-article"
-```
-
-Only use this on your own device and accounts. Always respect the target site's terms of service and copyright rules.
-
-## Common CLI Options
-
-```text
---output-dir <dir>              Markdown output directory. Default: clippings
---source-kind <kind>            auto, html-page, or rss-feed. Default: auto
---since <date>                  Keep only feed entries on or after YYYY-MM-DD
---limit <n>                     Process only the first N deduplicated URLs
---start <n>                     Start from the Nth deduplicated URL, 1-based
---end <n>                       End at the Nth deduplicated URL, 1-based; 0 means no upper bound
---fetch-mode <mode>             auto, static, browser, or stealth. Default: auto
---wait-ms <ms>                  Extra browser wait after load. Default: 2500
---wait-selector <selector>      Wait for a CSS selector
---click-selector <selector...>  Click one or more selectors after page load
---scroll-to-bottom              Scroll to the bottom before extraction
---headful                       Run with a visible browser window
---proxy <server>                Proxy server for browser/stealth fetch
---solve-cloudflare              In stealth mode, try to handle Cloudflare challenges
---disable-resources             In stealth mode, block images/media/fonts/stylesheets for speed
---prefer-browser-state          Try local Chrome user state first
---chrome-user-data-dir <path>   Chrome User Data directory
---chrome-profile <name>         Chrome profile name. Default: Default
---site-rules-dir <dir>          Optional directory of private TOML site rules
-```
-
-Run environment checks:
-
-```bash
-npm run dev -- doctor
-```
-
-For the full option list, run:
-
-```bash
-npm run dev -- --help
-```
-
-## Development
-
-```bash
-npm install
-npm run build
-npm run typecheck
-npm test
-```
-
-## Tips and Notes
-
-- Respect robots.txt, website terms of service, copyright, and rate limits.
-- For dynamic pages, try `--fetch-mode browser` first.
-- For static blogs and news sites, `--fetch-mode static` is usually faster.
-- Feedloom ships bundled TOML site rules for common dynamic/structured sites such as WeChat official account articles and Zhihu. Site rules can define extraction, cleanup, and fetch preferences. For example, the bundled Zhihu rule uses browser fetch with copied Chrome state when `--chrome-user-data-dir`/`--chrome-profile` are configured.
-- If article extraction is poor for a specific site, keep private TOML site rules outside the package and pass them with `--site-rules-dir <dir>`. Private rules are loaded after bundled rules.
-- For large batches, test with `--limit` before running the full job.
-
-## Acknowledgements
-
-Feedloom is inspired by several excellent open-source projects. Special thanks to:
-
-- [Defuddle](https://github.com/kepano/defuddle), for high-quality readable content extraction ideas.
-- [Patchright](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright), for inspiring robust browser automation and realistic page access.
-- [Scrapling](https://github.com/D4Vinci/Scrapling), for ideas around real browser contexts, anti-detection strategies, and resilient scraping fallbacks.
-
-Thanks also to Linkedom, Turndown, Commander, Vitest, and the wider TypeScript ecosystem for the reliable building blocks.
+- [Defuddle](https://github.com/kepano/defuddle)：可读正文抽取思路。
+- [Patchright](https://github.com/Kaliiiiiiiiii-Vinyzu/patchright)：浏览器自动化和更真实的页面访问能力。
+- [Scrapling](https://github.com/D4Vinci/Scrapling)：更稳健的抓取 fallback 思路。
 
 ## License
 

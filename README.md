@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="assets/logo.png" alt="Feedloom logo" width="160">
-  <h1>Feedloom</h1>
+  <img src="assets/logo.png" alt="Feedloom logo" width="160" style="display: block; margin: 0 auto;">
+  <h1 style="margin-top: 8px; margin-bottom: 8px;">Feedloom</h1>
   <p><strong>快速剪藏优质内容</strong></p>
   <p><strong>支持公众号、小红书、知乎、X、YouTube 等各种网站</strong></p>
   <p>

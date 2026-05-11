@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="assets/logo.png" alt="Feedloom logo" width="160">
-  <h1>Feedloom</h1>
+  <img src="assets/logo.png" alt="Feedloom logo" width="160" style="display: block; margin: 0 auto;">
+  <h1 style="margin-top: 8px; margin-bottom: 8px;">Feedloom</h1>
   <p><strong>Archive long-form web content as clean Markdown with local assets.</strong></p>
   <p>
     <a href="https://www.npmjs.com/package/@ariesfish/feedloom"><img alt="npm version" src="https://img.shields.io/npm/v/@ariesfish/feedloom"></a>

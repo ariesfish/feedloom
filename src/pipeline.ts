@@ -117,13 +117,14 @@ export async function processItem(item: UrlItem, options: ProcessItemOptions): P
   }
   const title = cleaned.metadata.title || item.sourceTitle || titleFromUrl(item.url);
   await cleanupExistingNote(options.outputDir, item.url);
+  const imageFetch = options.fetchImage ?? (activeProfiles.some((profile) => profile.fetch?.useProxyEnv) ? proxyAwareFetch : undefined);
   const contentHtml = options.localizeAssets === false
     ? cleaned.content
     : await localizeImages(cleaned.content, {
         outputDir: options.outputDir,
         noteSlug: sanitizeFilename(title),
         baseUrl: item.url,
-        fetchImage: options.fetchImage,
+        fetchImage: imageFetch,
       });
   const markdown = demoteTopLevelHeadings(stripLeadingDateLine(stripDuplicateLeadingHeading(htmlToMarkdown(contentHtml), title)));
   const outputPath = await writeMarkdownNote(options.outputDir, {

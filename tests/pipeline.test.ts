@@ -97,6 +97,39 @@ describe("processItem", () => {
     }
   });
 
+  it("uses the configured image fetcher before proxy-aware profile fallback", async () => {
+    const outputDir = await mkdtemp(join(tmpdir(), "feedloom-image-fetch-"));
+    try {
+      const result = await processItem(
+        { url: "https://example.com/image-fetch", sourceKind: "html-page" },
+        {
+          outputDir,
+          profiles: [
+            {
+              name: "demo",
+              match: { hostSuffixes: ["example.com"] },
+              fetch: { useProxyEnv: true },
+            },
+          ],
+          staticFetch: async () => `<!doctype html><html><head><title>Image Fetch</title></head><body><article>${longParagraph()}<img src="/demo.png"></article></body></html>`,
+          browserFetch: async () => {
+            throw new Error("browser should not be used");
+          },
+          fetchImage: async (input) => {
+            expect(String(input)).toBe("https://example.com/demo.png");
+            return new Response(new Uint8Array([1, 2, 3]), { headers: { "content-type": "image/png" } });
+          },
+        },
+      );
+
+      const note = await readFile(result.outputPath, "utf8");
+      expect(note).toContain("assets/Image%20Fetch/image-001.png");
+      await expect(readFile(join(outputDir, "assets", "Image Fetch", "image-001.png"))).resolves.toEqual(Buffer.from([1, 2, 3]));
+    } finally {
+      await rm(outputDir, { recursive: true, force: true });
+    }
+  });
+
   it("passes proxy-aware fetch to Defuddle for matching site profiles", async () => {
     const outputDir = await mkdtemp(join(tmpdir(), "feedloom-defuddle-fetch-"));
     try {

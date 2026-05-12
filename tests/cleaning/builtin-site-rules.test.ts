@@ -12,6 +12,7 @@ const builtinRulePaths = [
   join(repoRoot, "src", "site-rules", "x.toml"),
   join(repoRoot, "src", "site-rules", "xiaohongshu.toml"),
   join(repoRoot, "src", "site-rules", "youtube.toml"),
+  join(repoRoot, "src", "site-rules", "vllm.toml"),
   join(repoRoot, "src", "site-rules", "zhihu.toml"),
 ];
 
@@ -23,7 +24,7 @@ describe("built-in TOML site rules", () => {
   it("loads common site profiles from bundled TOML files", async () => {
     const profiles = await loadSiteProfiles(builtinRulePaths);
 
-    expect(profiles.map((profile) => profile.name)).toEqual(["wechat", "x", "xiaohongshu", "youtube", "zhihu"]);
+    expect(profiles.map((profile) => profile.name)).toEqual(["wechat", "x", "xiaohongshu", "youtube", "vllm", "zhihu"]);
     expect(profiles.find((profile) => profile.name === "wechat")?.content?.selectors).toContain("#js_content");
     expect(profiles.find((profile) => profile.name === "zhihu")?.metadata?.titleSuffixPatterns).toContain("\\s*-\\s*知乎\\s*$");
     expect(profiles.find((profile) => profile.name === "xiaohongshu")?.media).toMatchObject({
@@ -46,6 +47,16 @@ describe("built-in TOML site rules", () => {
     expect(profiles.find((profile) => profile.name === "x")?.extraction).toMatchObject({
       requireText: true,
     });
+    expect(profiles.find((profile) => profile.name === "vllm")?.content?.selectors).toEqual(["article.max-w-3xl"]);
+    expect(profiles.find((profile) => profile.name === "vllm")?.fetch).toMatchObject({
+      mode: "browser",
+      waitMs: 3000,
+      waitSelector: "article.max-w-3xl",
+      waitSelectorState: "attached",
+    });
+    expect(profiles.find((profile) => profile.name === "vllm")?.extraction).toMatchObject({
+      requireText: true,
+    });
     expect(profiles.find((profile) => profile.name === "zhihu")?.fetch).toMatchObject({
       mode: "browser",
       preferBrowserState: true,
@@ -66,6 +77,30 @@ describe("built-in TOML site rules", () => {
 
     expect(result.content).toContain("WeChat Article");
     expect(result.content).not.toContain("navigation should not be selected");
+  });
+
+  it("applies bundled vLLM profile extraction and cleanup", async () => {
+    const profiles = await loadSiteProfiles(builtinRulePaths);
+    const result = await cleanHtml(
+      `<!doctype html><html><body>
+        <main>site chrome ${longParagraph()}</main>
+        <article class="max-w-3xl">
+          <h1>vLLM Article</h1>
+          ${longParagraph()}
+          <p>Share:</p>
+          <p>Related Posts</p>
+          <p>tail noise</p>
+        </article>
+      </body></html>`,
+      { baseUrl: "https://vllm.ai/blog/deepseek-v4", profiles },
+    );
+
+    expect(result.content).toContain("vLLM Article");
+    expect(result.content).toContain("meaningful article text");
+    expect(result.content).not.toContain("site chrome");
+    expect(result.content).not.toContain("Share:");
+    expect(result.content).not.toContain("Related Posts");
+    expect(result.content).not.toContain("tail noise");
   });
 
   it("applies bundled Zhihu profile cleanup", async () => {

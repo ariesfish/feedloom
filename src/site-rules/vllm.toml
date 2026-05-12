@@ -1,0 +1,27 @@
+[match]
+host_suffixes = ["vllm.ai"]
+
+[extract]
+selectors = ["article.max-w-3xl"]
+require_text = true
+
+[fetch]
+mode = "browser"
+wait_ms = 3000
+wait_selector = "article.max-w-3xl"
+wait_selector_state = "attached"
+
+[clean.remove]
+selectors = [
+  "aside",
+  "nav",
+  "button",
+  "section[aria-label*='Related']",
+  "[aria-label*='Share']",
+  "[class*='share']",
+  "[class*='Share']",
+]
+text_contains = ["Share:", "Related Posts"]
+
+[clean.truncate]
+after_contains = ["Share:", "Related Posts"]

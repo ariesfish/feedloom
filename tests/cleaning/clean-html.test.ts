@@ -105,6 +105,36 @@ describe("Defuddle-backed cleanHtml", () => {
     expect(result.content).not.toContain("footer after marker");
   });
 
+  it("truncates only the marker paragraph and its siblings when the marker has preceding content", async () => {
+    // Regression: a marker that sits deep inside a content div with many
+    // preceding siblings must not promote the cut point up to an ancestor
+    // (which would delete the whole article body).
+    const profile = profileFromTomlRule("demo", {
+      match: { host_suffixes: ["example.com"] },
+      extract: { selectors: ["#content"] },
+      clean: { truncate: { after_contains: ["Repost marker"] } },
+    });
+
+    const result = await cleanHtml(
+      `<main id="content">
+        <article>
+          <p>first paragraph of the article</p>
+          ${longParagraph()}
+          <p>Repost marker with address</p>
+          <p>tail noise one</p>
+          <p>tail noise two</p>
+        </article>
+      </main>`,
+      { baseUrl: "https://example.com/post", profiles: [profile] },
+    );
+
+    expect(result.content).toContain("first paragraph of the article");
+    expect(result.content).toContain("meaningful article text");
+    expect(result.content).not.toContain("Repost marker");
+    expect(result.content).not.toContain("tail noise one");
+    expect(result.content).not.toContain("tail noise two");
+  });
+
   it("fills missing author metadata from site profile selectors", async () => {
     const profile = profileFromTomlRule("demo", {
       match: { host_suffixes: ["example.com"] },
@@ -206,5 +236,36 @@ describe("Defuddle-backed cleanHtml", () => {
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
+  });
+
+  it("rewrites MathJax script sources into placeholder spans and drops rendered output", async () => {
+    const result = await cleanHtml(
+      `<!doctype html>
+      <html>
+        <head><title>Math Article</title></head>
+        <body>
+          <nav>menu</nav>
+          <article>
+            <h1>Math Article</h1>
+            ${longParagraph()}
+            <p>inline formula <span class="MathJax_Preview"></span><span class="MathJax"><span class="math"><math><mi>x</mi></math></span></span><script type="math/tex">\\boldsymbol{x}_1</script> here.</p>
+            <div class="MathJax_Display"><span class="MathJax"><span class="math"><math><mi>y</mi></math></span></span></div><script type="math/tex; mode=display">\\begin{equation} y = mx \\end{equation}</script>
+            ${longParagraph()}
+          </article>
+        </body>
+      </html>`,
+      { baseUrl: "https://example.com/math" },
+    );
+
+    expect(result.content).toContain('data-feedloom-math="inline"');
+    expect(result.content).toContain('data-feedloom-math="display"');
+    const inlinePlaceholder = result.content.match(/<span data-feedloom-math="inline">([\s\S]*?)<\/span>/);
+    expect(inlinePlaceholder?.[1]).toContain("\\boldsymbol{x}_1");
+    const displayPlaceholder = result.content.match(/<span data-feedloom-math="display">([\s\S]*?)<\/span>/);
+    expect(displayPlaceholder?.[1]).toContain("\\begin{equation}");
+    expect(result.content).not.toContain('class="MathJax');
+    expect(result.content).not.toContain("<math");
+    expect(result.content).not.toContain("MathJax_Preview");
+    expect(result.content).not.toContain("math/tex");
   });
 });

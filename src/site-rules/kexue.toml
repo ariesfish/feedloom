@@ -1,0 +1,17 @@
+[match]
+host_suffixes = ["kexue.fm"]
+
+[extract]
+# Select the article body container only. This excludes the breadcrumb,
+# title/date/author header, category/tags, prev/next navigation, related-posts
+# list, and comments, which all live outside #PostContent in the page DOM.
+selectors = ["#PostContent"]
+require_text = true
+
+[fetch]
+mode = "browser"
+wait_ms = 3000
+
+[clean.truncate]
+# Defensive tail guard in case a repost notice still appears inside #PostContent.
+after_regexes = ["^转载到请包括本文地址"]

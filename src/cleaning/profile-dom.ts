@@ -62,14 +62,13 @@ function removeTrailingSiblings(element: Element, removals: RemovalRecord[], rea
 
 function truncationCutPoint(root: Element, element: Element): Element {
   let current = element;
-  let best = element;
   while (current.parentElement && current.parentElement !== root) {
     if (current.previousElementSibling) {
-      best = current;
+      return current;
     }
     current = current.parentElement;
   }
-  return current.previousElementSibling ? current : best;
+  return current.previousElementSibling ? current : element;
 }
 
 function truncateFromElement(root: Element, element: Element, removals: RemovalRecord[], reason: string): void {

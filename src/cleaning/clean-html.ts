@@ -23,6 +23,45 @@ const DEFAULT_FEEDLOOM_PROFILE: SiteProfile = {
   },
 };
 
+const MATH_SCRIPT_SELECTOR = 'script[type="math/tex"], script[type="math/tex; mode=display"]';
+const MATHJAX_RENDER_SELECTORS = [
+  ".MathJax",
+  ".MathJax_Display",
+  ".MathJax_Preview",
+  "mjx-container",
+  "mjx-assistive-mml",
+];
+
+/**
+ * MathJax leaves the original LaTeX source in `<script type="math/tex">` tags
+ * alongside its rendered output (MathML/CHTML/SVG). Defuddle and Turndown
+ * cannot turn the rendered output back into usable math, so when the source
+ * scripts are present we keep the LaTeX and drop the rendered containers.
+ *
+ * The scripts are rewritten to `<span data-feedloom-math="inline|display">`
+ * placeholder nodes that survive Defuddle extraction and are turned into
+ * `$...$` / `$$...$$` by a Turndown rule in `render/markdown.ts`.
+ */
+function protectMathScripts(document: Document): void {
+  const scripts = Array.from(document.querySelectorAll(MATH_SCRIPT_SELECTOR));
+  if (scripts.length === 0) return;
+
+  for (const script of scripts) {
+    const type = script.getAttribute("type") ?? "";
+    const isDisplay = /mode\s*=\s*display/.test(type);
+    const span = document.createElement("span");
+    span.setAttribute("data-feedloom-math", isDisplay ? "display" : "inline");
+    span.textContent = script.textContent ?? "";
+    script.replaceWith(span);
+  }
+
+  for (const selector of MATHJAX_RENDER_SELECTORS) {
+    for (const element of Array.from(document.querySelectorAll(selector))) {
+      element.remove();
+    }
+  }
+}
+
 type DefuddleParseResult = {
   title?: string;
   description?: string;
@@ -185,6 +224,7 @@ export class HtmlCleaner {
     const window = parseHTML(html);
     installDefuddleDomGlobals(window);
     const { document } = window;
+    protectMathScripts(document);
     const contentSelector = preferredContentSelector && document.querySelector(preferredContentSelector) ? preferredContentSelector : undefined;
     const doc = document as Document & { URL?: string };
     if (this.options.baseUrl) {

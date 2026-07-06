@@ -2,6 +2,21 @@ import { parseHTML } from "linkedom";
 import TurndownService from "turndown";
 import { gfm } from "turndown-plugin-gfm";
 
+// Math spans are emitted as NUL-delimited sentinels so cleanupMarkdown (which
+// escapes bare `$` before digits to protect currency like "$100") cannot
+// corrupt formula delimiters such as `$1 < g < h$`. Sentinels are restored to
+// `$...$` / `$$...$$` after cleanup. NUL never appears in real article text.
+const MATH_INLINE_OPEN = "\u0000fl-math-i\u0000";
+const MATH_INLINE_CLOSE = "\u0000fl-math-i-end\u0000";
+const MATH_DISPLAY_OPEN = "\u0000fl-math-d\u0000";
+const MATH_DISPLAY_CLOSE = "\u0000fl-math-d-end\u0000";
+
+function restoreMathSentinels(markdown: string): string {
+  return markdown
+    .replace(/\u0000fl-math-d\u0000([\s\S]*?)\u0000fl-math-d-end\u0000/g, (_match, content: string) => `\n\n$$${content}$$\n\n`)
+    .replace(/\u0000fl-math-i\u0000([\s\S]*?)\u0000fl-math-i-end\u0000/g, (_match, content: string) => `$${content}$`);
+}
+
 function normalizeImageReferences(markdown: string): string {
   return markdown.replace(/!\[([^\]]*)\]\(<([^>]+)>\)(?:\{[^}]*\})?/g, (_match, alt: string, url: string) => {
     return `![${alt}](${url})`;
@@ -51,6 +66,14 @@ export function htmlToMarkdown(html: string): string {
     bulletListMarker: "-",
   });
   turndown.use(gfm);
+  turndown.addRule("mathInline", {
+    filter: (node) => node.nodeName === "SPAN" && node.getAttribute("data-feedloom-math") === "inline",
+    replacement: (_content, node) => `${MATH_INLINE_OPEN}${node.textContent ?? ""}${MATH_INLINE_CLOSE}`,
+  });
+  turndown.addRule("mathDisplay", {
+    filter: (node) => node.nodeName === "SPAN" && node.getAttribute("data-feedloom-math") === "display",
+    replacement: (_content, node) => `${MATH_DISPLAY_OPEN}${node.textContent ?? ""}${MATH_DISPLAY_CLOSE}`,
+  });
   turndown.addRule("dropEmptyLinks", {
     filter: (node) => node.nodeName === "A" && !node.textContent?.trim(),
     replacement: () => "",
@@ -70,5 +93,5 @@ export function htmlToMarkdown(html: string): string {
       return `\n\n\`\`\`${language}\n${code.textContent?.replace(/\n$/, "") ?? ""}\n\`\`\`\n\n`;
     },
   });
-  return `${cleanupMarkdown(turndown.turndown(normalizeBlockCodeHtml(normalizeTableCellHtml(html))))}\n`;
+  return `${restoreMathSentinels(cleanupMarkdown(turndown.turndown(normalizeBlockCodeHtml(normalizeTableCellHtml(html)))))}\n`;
 }
